@@ -1,9 +1,11 @@
 import axios from 'axios';
-import { API_BASE_URL } from '../config/api';
+
+const runtimeApiBaseUrl = import.meta.env.VITE_API_BASE_URL || '/api';
+console.log('API Base URL:', runtimeApiBaseUrl);
 
 const api = axios.create({
-  baseURL: API_BASE_URL,
-  timeout: 25000
+  baseURL: runtimeApiBaseUrl,
+  timeout: 30000
 });
 
 api.interceptors.request.use((config) => {
