@@ -26,10 +26,25 @@ export const registerUser = async (data) => {
 };
 
 export const loginUser = async (data) => {
-  const res = await api.post('/auth/login', data);
-  const token = res.data.token;
-  saveAuth(token, { userId: res.data.userId, email: res.data.email, role: res.data.role });
-  return res.data;
+  const start = Date.now();
+  try {
+    const res = await api.post('/auth/login', data);
+    console.info('[AUTH][LOGIN][SUCCESS]', {
+      status: res.status,
+      durationMs: Date.now() - start
+    });
+    const token = res.data.token;
+    saveAuth(token, { userId: res.data.userId, email: res.data.email, role: res.data.role });
+    return res.data;
+  } catch (error) {
+    console.error('[AUTH][LOGIN][FAILURE]', {
+      status: error?.response?.status,
+      code: error?.code,
+      message: error?.message,
+      durationMs: Date.now() - start
+    });
+    throw error;
+  }
 };
 
 export const logoutUser = () => {

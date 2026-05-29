@@ -15,7 +15,7 @@ export default function BackendConnectionOverlay() {
     try {
       const response = await fetch(BACKEND_HEALTHCHECK_URL, { cache: 'no-store' });
       if (!mountedRef.current) return;
-      setIsAvailable(response.ok);
+      setIsAvailable(response.status < 500);
     } catch {
       if (!mountedRef.current) return;
       setIsAvailable(false);

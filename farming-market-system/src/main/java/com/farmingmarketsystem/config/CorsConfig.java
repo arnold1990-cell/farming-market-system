@@ -19,7 +19,9 @@ public class CorsConfig {
                 "http://127.0.0.1:5173",
                 "http://127.0.0.1:5174",
                 "http://10.0.2.2:5173",
-                "http://10.0.2.2:5174"
+                "http://10.0.2.2:5174",
+                "http://144.91.106.79",
+                "https://144.91.106.79"
         ));
         cfg.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept", "Origin", "X-Requested-With"));
         cfg.setExposedHeaders(List.of("Authorization", "Content-Type"));
