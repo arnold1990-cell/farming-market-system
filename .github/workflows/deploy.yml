@@ -3,66 +3,15 @@ name: Deploy Farming Market
 on:
   push:
     branches:
-      - main
+      - master
 
 jobs:
-  build-and-deploy:
+  test:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up Java 21
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: 21
-
-      - name: Build backend
-        run: mvn clean package -DskipTests
-
-      - name: Set up Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - name: Build frontend
-        working-directory: frontend
-        run: |
-          npm install
-          npm run build
-
-      - name: Upload backend jar
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
-          password: ${{ secrets.VPS_PASSWORD }}
-          source: "target/farming-market-system-0.0.1-SNAPSHOT.jar"
-          target: "/opt/farming-market/backend"
-          strip_components: 1
-
-      - name: Upload frontend dist
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
-          password: ${{ secrets.VPS_PASSWORD }}
-          source: "frontend/dist/*"
-          target: "/var/www/farming-market"
-          strip_components: 2
-
-      - name: Restart backend and nginx
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
-          password: ${{ secrets.VPS_PASSWORD }}
-          script: |
-            mv /opt/farming-market/backend/farming-market-system-0.0.1-SNAPSHOT.jar /opt/farming-market/backend/app.jar
-            chmod -R 755 /var/www/farming-market
-            chmod -R 755 /opt/farming-market/uploads
-            systemctl restart farming-market
-            systemctl reload nginx
-            systemctl status farming-market --no-pager
+      - name: Verify workflow
+        run: echo "GitHub Actions is working!"
