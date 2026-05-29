@@ -1,21 +1,43 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/farming
-    username: postgres
-    password: Crt@Ailsa
-    driver-class-name: org.postgresql.Driver
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+
   jpa:
     hibernate:
-      ddl-auto: update
-    show-sql: true
+      ddl-auto: ${JPA_DDL_AUTO:update}
+    show-sql: ${JPA_SHOW_SQL:true}
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: ${JPA_FORMAT_SQL:true}
+
+  jackson:
+    time-zone: ${JACKSON_TIMEZONE:UTC}
+
+  servlet:
+    multipart:
+      max-file-size: ${MULTIPART_MAX_FILE_SIZE:10MB}
+      max-request-size: ${MULTIPART_MAX_REQUEST_SIZE:50MB}
+
+server:
+  address: ${SERVER_ADDRESS:0.0.0.0}
+  port: ${SERVER_PORT:8080}
 
 app:
   jwt:
-    secret: your-256-bit-secret-key-here-change-in-production
-    expiration: 86400000 # 24 hours in ms
+    secret: ${JWT_SECRET}
+    expiration-ms: ${JWT_EXPIRATION_MS:86400000}
 
-server:
-  port: 8080
+  upload:
+    base-dir: ${UPLOAD_BASE_DIR:uploads}
+    products-dir: ${UPLOAD_PRODUCTS_DIR:uploads/products}
+
+  mapbox:
+    token: ${MAPBOX_TOKEN}
+
+springdoc:
+  api-docs:
+    path: ${SPRINGDOC_API_DOCS_PATH:/v3/api-docs}
+  swagger-ui:
+    path: ${SPRINGDOC_SWAGGER_UI_PATH:/swagger-ui.html}
