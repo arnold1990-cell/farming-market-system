@@ -31,3 +31,24 @@ build/
 
 ### VS Code ###
 .vscode/
+# Environment
+.env
+.env.*
+
+# Frontend build output
+frontend/dist/
+
+# Mobile projects
+mobile/
+mobile-app/
+
+# Uploads
+uploads/
+../uploads/
+
+# Node modules
+node_modules/
+frontend/node_modules/
+
+# Logs
+*.log
