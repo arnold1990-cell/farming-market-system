@@ -1,0 +1,1 @@
+export default function EmptyState({ title='No data', subtitle='Nothing to display here.' }) { return <div className="card p-8 text-center text-gray-500"><p className="font-semibold">{title}</p><p className="text-sm">{subtitle}</p></div>; }

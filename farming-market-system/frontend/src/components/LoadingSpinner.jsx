@@ -1,0 +1,1 @@
+export default function LoadingSpinner() { return <div className="h-40 grid place-items-center"><div className="h-8 w-8 rounded-full border-4 border-farm-green border-t-transparent animate-spin" /></div>; }

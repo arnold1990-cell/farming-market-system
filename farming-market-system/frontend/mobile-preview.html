@@ -1,0 +1,275 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Farming App Mobile Preview</title>
+  <style>
+    :root {
+      --bg-1: #0b1020;
+      --bg-2: #141c34;
+      --phone-body: #0c0f17;
+      --phone-edge: #2e3546;
+      --screen-border: #111722;
+      --accent-1: rgba(64, 224, 208, 0.35);
+      --accent-2: rgba(96, 165, 250, 0.3);
+      --phone-width: 390px;
+      --phone-height: 844px;
+      --safe-margin: 24px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+      font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+      color: #dbe5ff;
+      background:
+        radial-gradient(circle at 20% 20%, rgba(56, 189, 248, 0.18), transparent 45%),
+        radial-gradient(circle at 80% 70%, rgba(20, 184, 166, 0.14), transparent 50%),
+        linear-gradient(155deg, var(--bg-1), var(--bg-2));
+      overflow: hidden;
+    }
+
+    body {
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      position: relative;
+      isolation: isolate;
+    }
+
+    .ambient-glow {
+      position: absolute;
+      width: min(72vw, 780px);
+      aspect-ratio: 1;
+      border-radius: 50%;
+      filter: blur(46px);
+      background: radial-gradient(circle, rgba(59, 130, 246, 0.24), rgba(20, 184, 166, 0.08), transparent 65%);
+      animation: floatGlow 7s ease-in-out infinite alternate;
+      z-index: -1;
+    }
+
+    .phone-wrap {
+      width: min(var(--phone-width), calc(100vw - var(--safe-margin) * 2));
+      aspect-ratio: 390 / 844;
+      max-height: calc(100vh - var(--safe-margin) * 2);
+      position: relative;
+      transform-origin: center;
+    }
+
+    .phone {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      border-radius: 52px;
+      padding: 10px;
+      background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.08), transparent 28%),
+        linear-gradient(160deg, #0f1422, var(--phone-body));
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow:
+        0 28px 56px rgba(0, 0, 0, 0.65),
+        0 2px 0 rgba(255, 255, 255, 0.06) inset,
+        0 -2px 0 rgba(255, 255, 255, 0.04) inset,
+        0 0 0 1px var(--phone-edge);
+      overflow: hidden;
+      animation: breathe 4.6s ease-in-out infinite;
+    }
+
+    .phone::before,
+    .phone::after {
+      content: "";
+      position: absolute;
+      pointer-events: none;
+      z-index: 4;
+    }
+
+    .phone::before {
+      inset: 2px;
+      border-radius: 50px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .phone::after {
+      left: -40%;
+      top: -35%;
+      width: 120%;
+      height: 80%;
+      background: linear-gradient(115deg, rgba(255, 255, 255, 0.18), transparent 52%);
+      transform: rotate(9deg);
+    }
+
+    .screen {
+      width: 100%;
+      height: 100%;
+      border-radius: 44px;
+      border: 1px solid var(--screen-border);
+      background: #000;
+      overflow: hidden;
+      position: relative;
+      box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.04) inset;
+    }
+
+    .island {
+      position: absolute;
+      left: 50%;
+      top: 12px;
+      transform: translateX(-50%);
+      width: 124px;
+      height: 35px;
+      border-radius: 18px;
+      background: linear-gradient(180deg, #0a0a0b, #111214);
+      box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.08) inset,
+        0 10px 16px rgba(0, 0, 0, 0.45);
+      z-index: 5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      pointer-events: none;
+    }
+
+    .speaker {
+      width: 42px;
+      height: 5px;
+      border-radius: 10px;
+      background: linear-gradient(90deg, #26272a, #1a1b1f);
+      box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.04) inset;
+    }
+
+    .camera {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #4f46e5, #111 62%);
+      box-shadow:
+        0 0 0 2px rgba(255, 255, 255, 0.03) inset,
+        0 0 8px rgba(79, 70, 229, 0.35);
+    }
+
+    iframe {
+      display: block;
+      width: 100%;
+      height: 100%;
+      border: 0;
+      background: #fff;
+      border-radius: inherit;
+      overflow: auto;
+      -webkit-overflow-scrolling: touch;
+      touch-action: pan-x pan-y;
+    }
+
+    .phone-wrap::before,
+    .phone-wrap::after {
+      content: "";
+      position: absolute;
+      z-index: -1;
+      border-radius: 60px;
+      inset: -16px;
+      pointer-events: none;
+    }
+
+    .phone-wrap::before {
+      background: linear-gradient(145deg, var(--accent-1), var(--accent-2));
+      filter: blur(20px);
+      opacity: 0.8;
+      animation: pulse 3.4s ease-in-out infinite;
+    }
+
+    .phone-wrap::after {
+      background: rgba(11, 16, 32, 0.42);
+      filter: blur(6px);
+      transform: translateY(16px) scale(0.95);
+    }
+
+    @keyframes pulse {
+      0%,
+      100% {
+        opacity: 0.55;
+        transform: scale(0.98);
+      }
+      50% {
+        opacity: 0.9;
+        transform: scale(1.03);
+      }
+    }
+
+    @keyframes breathe {
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-4px);
+      }
+    }
+
+    @keyframes floatGlow {
+      0% {
+        transform: translate3d(-2%, -1%, 0) scale(0.98);
+      }
+      100% {
+        transform: translate3d(2%, 2%, 0) scale(1.03);
+      }
+    }
+
+    @media (max-height: 900px), (max-width: 520px) {
+      .phone {
+        border-radius: 42px;
+      }
+
+      .screen {
+        border-radius: 35px;
+      }
+
+      .phone-wrap::before,
+      .phone-wrap::after {
+        border-radius: 45px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="ambient-glow" aria-hidden="true"></div>
+
+  <main class="phone-wrap" aria-label="Mobile app preview frame">
+    <section class="phone" role="presentation">
+      <div class="screen">
+        <div class="island" aria-hidden="true">
+          <span class="speaker"></span>
+          <span class="camera"></span>
+        </div>
+        <iframe
+          id="appPreview"
+          title="Farming App Mobile Preview"
+          src="http://localhost:5173"
+          loading="eager"
+          allow="clipboard-read; clipboard-write"
+          referrerpolicy="strict-origin-when-cross-origin"
+        ></iframe>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    (function () {
+      const iframe = document.getElementById("appPreview");
+      const url = new URL(window.location.href);
+      const paramSrc = url.searchParams.get("src");
+      const defaultSrc = "http://localhost:5173";
+
+      iframe.src = paramSrc || defaultSrc;
+
+      iframe.addEventListener("error", function () {
+        console.warn("Preview app could not be loaded. Ensure Vite dev server is running.");
+      });
+    })();
+  </script>
+</body>
+</html>
