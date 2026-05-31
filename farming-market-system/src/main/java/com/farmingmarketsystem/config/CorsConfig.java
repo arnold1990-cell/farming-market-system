@@ -16,11 +16,13 @@ public class CorsConfig {
         cfg.setAllowedOriginPatterns(List.of(
                 "http://localhost:5173",
                 "http://localhost:5174",
+                "http://localhost:3000",
                 "http://127.0.0.1:5173",
                 "http://127.0.0.1:5174",
                 "http://10.0.2.2:5173",
                 "http://10.0.2.2:5174",
                 "http://144.91.106.79",
+                "http://144.91.106.79:80",
                 "https://144.91.106.79"
         ));
         cfg.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept", "Origin", "X-Requested-With"));

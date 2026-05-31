@@ -2,3 +2,59 @@ on:
   push:
     branches:
       - master
+
+name: Deploy Farming Market System
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Build backend
+        run: mvn -q -DskipTests package
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Build frontend with production env
+        working-directory: frontend
+        run: |
+          npm ci
+          npm run build
+
+      - name: Copy project to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          source: "."
+          target: "/opt/farming-market-system"
+          rm: true
+
+      - name: Deploy with Docker Compose and verify health
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          script: |
+            set -e
+            cd /opt/farming-market-system
+            docker compose pull || true
+            docker compose down --remove-orphans
+            docker compose up -d --build
+            sleep 10
+            curl -f http://144.91.106.79/api/health

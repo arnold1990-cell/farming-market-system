@@ -1,6 +1,6 @@
 const trimSlashes = (value) => String(value || '').trim().replace(/\/+$/, '');
 
-const rawEnvBase = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || '/api';
+const rawEnvBase = import.meta.env.VITE_API_BASE_URL || '/api';
 const normalizedEnvBase = trimSlashes(rawEnvBase);
 
 const ensureApiPrefix = (value) => {
@@ -16,7 +16,7 @@ const toOrigin = (value) => {
 
 export const API_BASE_URL = ensureApiPrefix(normalizedEnvBase);
 export const API_ORIGIN = toOrigin(API_BASE_URL);
-export const BACKEND_HEALTHCHECK_PATH = '/products';
+export const BACKEND_HEALTHCHECK_PATH = '/health';
 export const BACKEND_HEALTHCHECK_URL = `${API_BASE_URL}${BACKEND_HEALTHCHECK_PATH}`;
 
 export const withApiBase = (path = '') => {

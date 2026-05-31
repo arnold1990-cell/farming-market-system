@@ -27,6 +27,7 @@ public class SecurityConfig {
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/health", "/api/farmers").permitAll()
                         .requestMatchers("/api/auth/register", "/api/auth/login", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                         .requestMatchers("/api/payments/orange-money/callback", "/api/payments/myzaka/callback").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/products", "/api/products/*", "/api/products/public", "/api/products/public/*", "/api/categories", "/api/reviews/products/*", "/uploads/**").permitAll()

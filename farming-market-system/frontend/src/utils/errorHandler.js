@@ -4,8 +4,9 @@ export const isNetworkError = (error) => {
 
 export const getApiErrorMessage = (error, fallback = 'Something went wrong') => {
   if (!error) return fallback;
+  if (error?.userMessage) return error.userMessage;
   if (error?.code === 'ECONNABORTED') return 'The server is taking too long to respond. Please retry.';
-  if (isNetworkError(error)) return 'Connecting to backend...';
+  if (isNetworkError(error)) return 'Could not connect to the server. Please try again.';
   const status = error?.response?.status;
   const backendMessage = error?.response?.data?.message;
   if (backendMessage) return backendMessage;
