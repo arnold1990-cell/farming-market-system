@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
-import { useEffect, useMemo, useState } from 'react';
-import { Clock3, Flame, MapPin, Sparkles, Tag } from 'lucide-react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Flame, MapPin, Sparkles, Tag } from 'lucide-react';
 import AppLayout from '../layouts/AppLayout';
 import ToastStack from '../components/ToastStack';
 import ProductCard from '../components/ProductCard';
@@ -35,21 +35,22 @@ export default function LandingPage() {
     setTimeout(() => setToasts((prev) => prev.filter((t) => t.id !== id)), 3000);
   };
 
-  useEffect(() => {
-    const load = async () => {
-      setLoading(true);
-      setError('');
-      try {
-        const products = await getApprovedMarketplaceFeed();
-        setPublicProducts(products || []);
-      } catch (err) {
-        setError(getApiErrorMessage(err, 'Failed to load products'));
-      } finally {
-        setLoading(false);
-      }
-    };
-    load();
+  const load = useCallback(async () => {
+    setLoading(true);
+    setError('');
+    try {
+      const products = await getApprovedMarketplaceFeed();
+      setPublicProducts(products || []);
+    } catch (err) {
+      setError(getApiErrorMessage(err, 'Could not load products. Please try again.'));
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    load();
+  }, [load]);
 
   const categoryOptions = useMemo(() => ['ALL', ...Array.from(new Set(publicProducts.map((p) => p.categoryName).filter(Boolean)))], [publicProducts]);
 
@@ -61,6 +62,10 @@ export default function LandingPage() {
 
   const trendingProducts = useMemo(() => filtered.slice(0, 8), [filtered]);
   const flashDeals = useMemo(() => filtered.filter((p, i) => i % 3 === 0).slice(0, 8), [filtered]);
+  const hasRealFlashDealExpiry = useMemo(
+    () => flashDeals.some((p) => p?.dealExpiryAt || p?.expiresAt || p?.discountEndsAt),
+    [flashDeals]
+  );
   const recommendedProducts = useMemo(() => filtered.slice(2, 10), [filtered]);
   const nearbyFarmers = useMemo(() => {
     const grouped = filtered.reduce((acc, p) => {
@@ -118,7 +123,7 @@ export default function LandingPage() {
             <h2 className="inline-flex items-center gap-1 text-base font-bold"><Sparkles size={16} className="text-farm-green" />Trending Products</h2>
             <Link to="/marketplace" className="text-xs font-semibold text-farm-green">See all</Link>
           </div>
-          {loading ? <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">{Array.from({ length: 6 }).map((_, i) => <LoadingSkeleton key={i} className="h-52" />)}</div> : error ? <p className="text-sm text-red-600">{error}</p> : trendingProducts.length ? <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">{trendingProducts.map((p) => <ProductCard key={p.id} product={mapProduct(p)} onAdd={() => onAdd(p)} />)}</div> : <p className="text-sm text-gray-500">No products available.</p>}
+          {loading ? <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">{Array.from({ length: 6 }).map((_, i) => <LoadingSkeleton key={i} className="h-52" />)}</div> : error ? <div className="rounded-xl border border-red-200 bg-red-50 p-4"><p className="text-sm text-red-700">{error}</p><button type="button" className="mt-3 rounded-lg border border-red-300 bg-white px-3 py-1.5 text-xs font-semibold text-red-700" onClick={load}>Retry</button></div> : trendingProducts.length ? <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">{trendingProducts.map((p) => <ProductCard key={p.id} product={mapProduct(p)} onAdd={() => onAdd(p)} />)}</div> : <p className="text-sm text-gray-500">No products available.</p>}
         </section>
 
         <section className="space-y-3">
@@ -133,7 +138,7 @@ export default function LandingPage() {
         <section className="space-y-3">
           <div className="flex items-center justify-between">
             <h2 className="inline-flex items-center gap-1 text-base font-bold"><Flame size={16} className="text-red-500" />Flash Deals</h2>
-            <span className="inline-flex items-center gap-1 rounded-full bg-red-50 px-2 py-1 text-[11px] font-semibold text-red-600"><Clock3 size={12} />Limited time</span>
+            {hasRealFlashDealExpiry ? <span className="inline-flex items-center rounded-full bg-red-50 px-2 py-1 text-[11px] font-semibold text-red-600">Deal ending soon</span> : null}
           </div>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {flashDeals.map((p) => <ProductCard key={`deal-${p.id}`} product={mapProduct(p, Number(p.price) * 1.18)} onAdd={() => onAdd(p)} />)}
