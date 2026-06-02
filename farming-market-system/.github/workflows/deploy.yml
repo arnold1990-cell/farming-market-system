@@ -58,3 +58,4 @@ jobs:
             docker compose up -d --build
             sleep 10
             curl -f http://144.91.106.79/api/health
+            curl -f http://144.91.106.79/api/auth/health || true

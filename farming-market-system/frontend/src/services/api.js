@@ -1,10 +1,10 @@
 import axios from 'axios';
+import { API_BASE_URL } from '../config/api';
 
-const runtimeApiBaseUrl = import.meta.env.VITE_API_BASE_URL || '/api';
 const withCredentials = String(import.meta.env.VITE_API_WITH_CREDENTIALS || 'false').toLowerCase() === 'true';
 
 const api = axios.create({
-  baseURL: runtimeApiBaseUrl,
+  baseURL: API_BASE_URL,
   timeout: 30000,
   withCredentials
 });
@@ -73,7 +73,7 @@ api.interceptors.response.use(
     }
 
     if (error?.code === 'ECONNABORTED') {
-      error.userMessage = 'The server is taking too long to respond. Please try again.';
+      error.userMessage = 'Server is taking too long to respond. Please try again.';
     } else if (error?.code === 'ERR_NETWORK') {
       error.userMessage = 'Could not reach the server. Please check your connection and retry.';
     }

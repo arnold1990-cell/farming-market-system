@@ -248,7 +248,7 @@
         <iframe
           id="appPreview"
           title="Farming App Mobile Preview"
-          src="http://localhost:5173"
+          src="/"
           loading="eager"
           allow="clipboard-read; clipboard-write"
           referrerpolicy="strict-origin-when-cross-origin"
@@ -262,7 +262,7 @@
       const iframe = document.getElementById("appPreview");
       const url = new URL(window.location.href);
       const paramSrc = url.searchParams.get("src");
-      const defaultSrc = "http://localhost:5173";
+      const defaultSrc = "/";
 
       iframe.src = paramSrc || defaultSrc;
 

@@ -1,6 +1,9 @@
 const trimSlashes = (value) => String(value || '').trim().replace(/\/+$/, '');
 
-const rawEnvBase = import.meta.env.VITE_API_BASE_URL || '/api';
+const rawEnvBase =
+  import.meta.env.VITE_API_URL ||
+  import.meta.env.VITE_API_BASE_URL ||
+  '/api';
 const normalizedEnvBase = trimSlashes(rawEnvBase);
 
 const ensureApiPrefix = (value) => {
