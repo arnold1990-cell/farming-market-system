@@ -34,18 +34,12 @@ public class CorsConfig {
 
     private List<String> resolveAllowedOriginPatterns() {
         Set<String> allowedOrigins = new LinkedHashSet<>(List.of(
-                "http://localhost:5173",
-                "http://192.168.1.123:5173",
-                "http://172.25.160.1:5173",
-                "http://localhost:5174",
-                "http://localhost:3000",
-                "http://127.0.0.1:5173",
-                "http://127.0.0.1:5174",
-                "http://10.0.2.2:5173",
-                "http://10.0.2.2:5174",
-                "http://144.91.106.79",
-                "http://144.91.106.79:80",
-                "https://144.91.106.79"
+                "http://localhost:*",
+                "http://127.0.0.1:*",
+                "http://10.0.2.2:*",
+                "http://192.168.*:*",
+                "http://172.*:*",
+                "http://10.*:*"
         ));
 
         if (configuredAllowedOriginPatterns == null || configuredAllowedOriginPatterns.isBlank()) {

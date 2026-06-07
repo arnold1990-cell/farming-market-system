@@ -1,11 +1,11 @@
 import api from './api';
 
 const probeTargets = [
-  { key: 'auth', path: '/api/auth/login', method: 'GET' },
+  { key: 'health', path: '/api/health' },
   { key: 'products', path: '/api/products/public' },
-  { key: 'farmers', path: '/api/farmer/dashboard/summary' },
+  { key: 'farmers', path: '/api/farmers' },
   { key: 'categories', path: '/api/categories' },
-  { key: 'dashboard', path: '/api/products' }
+  { key: 'catalog', path: '/api/products' }
 ];
 
 async function probe({ path, method = 'GET', body }) {

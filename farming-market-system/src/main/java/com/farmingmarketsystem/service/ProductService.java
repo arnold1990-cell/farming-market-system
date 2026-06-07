@@ -59,7 +59,6 @@ public class ProductService {
                 .stream()
                 .map(this::toDto)
                 .toList();
-        System.out.println("Public products count: " + products.size());
         return products;
     }
 

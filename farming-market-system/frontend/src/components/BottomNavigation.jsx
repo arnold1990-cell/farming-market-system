@@ -1,44 +1,54 @@
-import { Home, Search, Map, ClipboardList, User, LayoutDashboard, Package, CloudRain, Users, Settings, Truck, Route, History, BarChart3 } from 'lucide-react';
+import { Home, Search, ShoppingCart, ClipboardList, User, LayoutDashboard, Package, Users, Truck } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
+import { getCurrentUser, isAuthenticated } from '../services/authService';
+
+const publicNav = [
+  { path: '/', label: 'Home', icon: Home },
+  { path: '/marketplace', label: 'Market', icon: Search },
+  { path: '/cart', label: 'Cart', icon: ShoppingCart, center: true },
+  { path: '/login', label: 'Sign In', icon: User }
+];
 
 const roleNav = {
   BUYER: [
     { path: '/buyer/dashboard', label: 'Home', icon: Home },
     { path: '/marketplace', label: 'Market', icon: Search },
-    { path: '/buyer/map', label: 'Map', icon: Map, center: true },
-    { path: '/buyer/calendar', label: 'Calendar', icon: ClipboardList },
-    { path: '/login', label: 'Profile', icon: User }
+    { path: '/cart', label: 'Cart', icon: ShoppingCart, center: true },
+    { path: '/orders', label: 'Orders', icon: ClipboardList }
   ],
   FARMER: [
     { path: '/farmer/dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { path: '/farmer/products', label: 'Produce', icon: Package },
+    { path: '/farmer/orders', label: 'Orders', icon: ShoppingCart },
     { path: '/farmer/calendar', label: 'Calendar', icon: ClipboardList },
-    { path: '/farmer/weather', label: 'Weather', icon: CloudRain },
     { path: '/farmer/profile', label: 'Profile', icon: User }
   ],
   ADMIN: [
     { path: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { path: '/admin/farmers', label: 'Farmers', icon: Users },
-    { path: '/admin/products', label: 'Listings', icon: ClipboardList },
-    { path: '/admin/alerts', label: 'Alerts', icon: Settings },
-    { path: '/admin/dashboard', label: 'Analytics', icon: BarChart3 },
+    { path: '/admin/products', label: 'Listings', icon: Package },
     { path: '/admin/users', label: 'Settings', icon: User }
   ],
   DELIVERY_AGENT: [
-    { path: '/delivery/dashboard', label: 'Deliveries', icon: Truck },
-    { path: '/delivery/dashboard', label: 'Routes', icon: Route },
-    { path: '/delivery/dashboard', label: 'History', icon: History },
-    { path: '/login', label: 'Profile', icon: User }
+    { path: '/delivery/dashboard', label: 'Deliveries', icon: Truck }
   ]
 };
 
 export default function BottomNavigation({ role = 'BUYER' }) {
   const { pathname } = useLocation();
-  const items = roleNav[role] || roleNav.BUYER;
+  const user = getCurrentUser();
+  const items = isAuthenticated() && user ? (roleNav[role] || roleNav.BUYER) : publicNav;
+  const gridColsClass = {
+    1: 'grid-cols-1',
+    2: 'grid-cols-2',
+    3: 'grid-cols-3',
+    4: 'grid-cols-4',
+    5: 'grid-cols-5'
+  }[items.length] || 'grid-cols-4';
 
   return (
     <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200/80 bg-white/95 px-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-1 shadow-[0_-6px_20px_rgba(15,23,42,0.08)] backdrop-blur lg:hidden">
-      <div className={`grid ${items.length === 4 ? 'grid-cols-4' : 'grid-cols-5'} items-center`}>
+      <div className={`grid ${gridColsClass} items-center`}>
         {items.map((item) => {
           const Icon = item.icon;
           const active = pathname === item.path;

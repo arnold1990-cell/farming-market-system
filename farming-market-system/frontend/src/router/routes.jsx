@@ -18,7 +18,6 @@ import FarmerWeatherPage from '../pages/farmer/FarmerWeatherPage';
 import DeliveryDashboardPage from '../pages/delivery/DeliveryDashboardPage';
 import AdminDashboardPage from '../pages/admin/AdminDashboardPage';
 import AdminManagementPage from '../pages/admin/AdminManagementPage';
-import AdminAlertsPage from '../pages/admin/AdminAlertsPage';
 import FarmersPage from '../pages/admin/FarmersPage';
 import NotFoundPage from '../pages/NotFoundPage';
 import ProtectedRoute from '../routes/ProtectedRoute';
@@ -42,7 +41,6 @@ export const routes = [
   { path: '/farmer/products', element: <ProtectedRoute><RoleRoute roles={['FARMER']}><FarmerProductsPage /></RoleRoute></ProtectedRoute> },
   { path: '/farmer/orders', element: <ProtectedRoute><RoleRoute roles={['FARMER']}><FarmerOrdersPage /></RoleRoute></ProtectedRoute> },
   { path: '/farmer/calendar', element: <ProtectedRoute><RoleRoute roles={['FARMER']}><FarmerWeatherPage /></RoleRoute></ProtectedRoute> },
-  { path: '/farmer/weather', element: <ProtectedRoute><RoleRoute roles={['FARMER']}><FarmerWeatherPage /></RoleRoute></ProtectedRoute> },
   { path: '/farmer/profile', element: <ProtectedRoute><RoleRoute roles={['FARMER']}><FarmerProfilePage /></RoleRoute></ProtectedRoute> },
   { path: '/farmer/products/:id', element: <ProtectedRoute><RoleRoute roles={['FARMER']}><FarmerProductDetailsPage /></RoleRoute></ProtectedRoute> },
 
@@ -56,7 +54,6 @@ export const routes = [
   { path: '/admin/orders', element: <ProtectedRoute><RoleRoute roles={['ADMIN']}><AdminManagementPage /></RoleRoute></ProtectedRoute> },
   { path: '/admin/categories', element: <ProtectedRoute><RoleRoute roles={['ADMIN']}><AdminManagementPage /></RoleRoute></ProtectedRoute> },
   { path: '/admin/deliveries', element: <ProtectedRoute><RoleRoute roles={['ADMIN']}><AdminManagementPage /></RoleRoute></ProtectedRoute> },
-  { path: '/admin/alerts', element: <ProtectedRoute><RoleRoute roles={['ADMIN']}><AdminAlertsPage /></RoleRoute></ProtectedRoute> },
 
   { path: '*', element: <NotFoundPage /> }
 ];

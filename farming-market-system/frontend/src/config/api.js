@@ -1,4 +1,4 @@
-const DEVELOPMENT_API_FALLBACK = 'http://localhost:8081/api';
+const DEVELOPMENT_API_FALLBACK = 'http://localhost:8080/api';
 
 const trimSlashes = (value) => String(value || '').trim().replace(/\/+$/, '');
 
@@ -29,5 +29,3 @@ export const withApiBase = (path = '') => {
   }
   return `${API_BASE_URL}${normalizedPath}`;
 };
-
-export const BACKEND_HEALTHCHECK_URL = withApiBase(BACKEND_HEALTHCHECK_PATH);

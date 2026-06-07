@@ -39,8 +39,6 @@ public class ProductController {
                                                                           @RequestParam(required = false) BigDecimal maxPrice) {
         String normalizedLocation = blankToNull(location);
         String normalizedKeyword = blankToNull(keyword);
-        System.out.println("Public products endpoint hit");
-        System.out.println("filters: featured=" + featured + ", location=" + normalizedLocation + ", search=" + normalizedKeyword);
         return ResponseEntity.ok(service.browsePublic(featured, categoryId, currency, normalizedLocation, normalizedKeyword, minPrice, maxPrice));
     }
 

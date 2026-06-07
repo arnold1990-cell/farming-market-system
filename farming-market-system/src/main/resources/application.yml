@@ -1,10 +1,14 @@
 spring:
+  config:
+    import: optional:file:.env[.properties]
+
   datasource:
     url: ${DB_URL}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
 
   jpa:
+    open-in-view: false
     hibernate:
       ddl-auto: ${JPA_DDL_AUTO:update}
     show-sql: ${JPA_SHOW_SQL:true}
@@ -41,3 +45,17 @@ springdoc:
     path: ${SPRINGDOC_API_DOCS_PATH:/v3/api-docs}
   swagger-ui:
     path: ${SPRINGDOC_SWAGGER_UI_PATH:/swagger-ui.html}
+
+payments:
+  orange-money:
+    enabled: ${ORANGE_MONEY_ENABLED:false}
+    base-url: ${ORANGE_MONEY_BASE_URL:}
+    merchant-id: ${ORANGE_MONEY_MERCHANT_ID:}
+    api-key: ${ORANGE_MONEY_API_KEY:}
+    callback-url: ${ORANGE_MONEY_CALLBACK_URL:}
+  myzaka:
+    enabled: ${MYZAKA_ENABLED:false}
+    base-url: ${MYZAKA_BASE_URL:}
+    merchant-id: ${MYZAKA_MERCHANT_ID:}
+    api-key: ${MYZAKA_API_KEY:}
+    callback-url: ${MYZAKA_CALLBACK_URL:}

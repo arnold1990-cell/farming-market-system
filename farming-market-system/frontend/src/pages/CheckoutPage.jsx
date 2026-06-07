@@ -9,7 +9,6 @@ import MobileFormField from '../components/MobileFormField';
 import Input from '../components/Input';
 import { getCart, clearCart } from '../services/cartService';
 import { confirmOnlinePayment, initiateMyZaka, initiateOnlinePayment, initiateOrangeMoney, placeOrder } from '../services/orderService';
-import api from '../services/api';
 import { getApiErrorMessage } from '../utils/errorHandler';
 
 export default function CheckoutPage() {
@@ -46,12 +45,10 @@ export default function CheckoutPage() {
       if (paymentMethod === 'ONLINE_PAYMENT') {
         if (onlineChannel === 'ORANGE_MONEY') {
           const p = await initiateOrangeMoney(order.id, customerPhone);
-          setPaymentMessage(`Orange Money initiated. Ref: ${p.transactionReference}`);
-          await api.post(`/payments/mock/${p.id}/confirm`, { paid: true });
+          setPaymentMessage(`Orange Money initiated. Complete the provider payment flow using reference ${p.transactionReference}.`);
         } else if (onlineChannel === 'MYZAKA') {
           const p = await initiateMyZaka(order.id, customerPhone);
-          setPaymentMessage(`MyZaka initiated. Ref: ${p.transactionReference}`);
-          await api.post(`/payments/mock/${p.id}/confirm`, { paid: true });
+          setPaymentMessage(`MyZaka initiated. Complete the provider payment flow using reference ${p.transactionReference}.`);
         } else {
           await initiateOnlinePayment(order.id);
           await confirmOnlinePayment(order.id);
@@ -69,5 +66,5 @@ export default function CheckoutPage() {
   if (loading) return <AppLayout title="Checkout"><LoadingSpinner /></AppLayout>;
   if (!cart?.items?.length) return <AppLayout title="Checkout"><EmptyState title="Cart is empty" subtitle="Add products first." /></AppLayout>;
 
-  return <AppLayout title="Checkout"><div className="space-y-4"><div className="card space-y-3 p-4"><MobileFormField label="Delivery Address"><Input placeholder="Street / Address" value={address} onChange={(e) => setAddress(e.target.value)} /></MobileFormField><MobileFormField label="Payment Method"><Select value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value)}><option value="ONLINE_PAYMENT">Pay Online</option><option value="CASH_ON_DELIVERY">Cash on Delivery</option><option value="PAY_ON_PICKUP">Pay on Pickup</option></Select></MobileFormField>{paymentMethod === 'ONLINE_PAYMENT' ? <><MobileFormField label="Online Channel"><Select value={onlineChannel} onChange={(e) => setOnlineChannel(e.target.value)}><option value="CARD">Card / Online</option><option value="ORANGE_MONEY">Orange Money</option><option value="MYZAKA">MyZaka</option></Select></MobileFormField>{(onlineChannel === 'ORANGE_MONEY' || onlineChannel === 'MYZAKA') ? <MobileFormField label="Customer Phone" error={!customerPhone.trim() ? 'Phone required for mobile money.' : ''}><Input placeholder="7XXXXXXXX" value={customerPhone} onChange={(e) => setCustomerPhone(e.target.value)} /></MobileFormField> : null}</> : null}<p className="text-sm text-gray-600">{paymentMethod === 'ONLINE_PAYMENT' ? 'For Orange Money/MyZaka, payment starts as INITIATED and completes after callback/mock confirm.' : 'Farmer will confirm cash receipt before sale is finalized.'}</p>{paymentMessage ? <p className="text-sm text-green-700">{paymentMessage}</p> : null}{error ? <p className="text-sm text-red-600">{error}</p> : null}</div><div className="card p-4"><h3 className="font-semibold">Order Summary</h3><p className="mt-2 text-sm">Items: {cart.items.length}</p><p className="text-sm">Total: BWP {total.toFixed(2)}</p><Button className="mt-4 w-full py-3" onClick={onPlace} disabled={submitting || (paymentMethod === 'ONLINE_PAYMENT' && (onlineChannel === 'ORANGE_MONEY' || onlineChannel === 'MYZAKA') && !customerPhone.trim())}>{submitting ? 'Placing...' : 'Place Order'}</Button></div></div></AppLayout>;
+  return <AppLayout title="Checkout"><div className="space-y-4"><div className="card space-y-3 p-4"><MobileFormField label="Delivery Address"><Input placeholder="Street / Address" value={address} onChange={(e) => setAddress(e.target.value)} /></MobileFormField><MobileFormField label="Payment Method"><Select value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value)}><option value="ONLINE_PAYMENT">Pay Online</option><option value="CASH_ON_DELIVERY">Cash on Delivery</option><option value="PAY_ON_PICKUP">Pay on Pickup</option></Select></MobileFormField>{paymentMethod === 'ONLINE_PAYMENT' ? <><MobileFormField label="Online Channel"><Select value={onlineChannel} onChange={(e) => setOnlineChannel(e.target.value)}><option value="CARD">Card / Online</option><option value="ORANGE_MONEY">Orange Money</option><option value="MYZAKA">MyZaka</option></Select></MobileFormField>{(onlineChannel === 'ORANGE_MONEY' || onlineChannel === 'MYZAKA') ? <MobileFormField label="Customer Phone" error={!customerPhone.trim() ? 'Phone required for mobile money.' : ''}><Input placeholder="7XXXXXXXX" value={customerPhone} onChange={(e) => setCustomerPhone(e.target.value)} /></MobileFormField> : null}</> : null}<p className="text-sm text-gray-600">{paymentMethod === 'ONLINE_PAYMENT' ? 'Card payments confirm immediately. Orange Money and MyZaka remain initiated until the provider callback marks them as paid.' : 'Farmer will confirm cash receipt before sale is finalized.'}</p>{paymentMessage ? <p className="text-sm text-green-700">{paymentMessage}</p> : null}{error ? <p className="text-sm text-red-600">{error}</p> : null}</div><div className="card p-4"><h3 className="font-semibold">Order Summary</h3><p className="mt-2 text-sm">Items: {cart.items.length}</p><p className="text-sm">Total: BWP {total.toFixed(2)}</p><Button className="mt-4 w-full py-3" onClick={onPlace} disabled={submitting || (paymentMethod === 'ONLINE_PAYMENT' && (onlineChannel === 'ORANGE_MONEY' || onlineChannel === 'MYZAKA') && !customerPhone.trim())}>{submitting ? 'Placing...' : 'Place Order'}</Button></div></div></AppLayout>;
 }
