@@ -11,6 +11,7 @@ export const getPublicProducts = async (params) => {
 export const getProductById = async (id) => (await api.get(`/products/${id}`)).data;
 export const getPublicProductById = async (id) => (await api.get(`/products/public/${id}`)).data;
 export const searchProducts = async (keyword) => (await api.get('/products/search', { params: { keyword } })).data;
+export const getProductMapListings = async (params) => (await api.get('/products/map', { params })).data;
 export const getMyProducts = async () => (await api.get('/farmer/products')).data;
 export const getFarmerDashboard = async () => (await api.get('/products/farmer/dashboard')).data;
 export const createProduct = async (data) => (await api.post('/farmer/products', data)).data;

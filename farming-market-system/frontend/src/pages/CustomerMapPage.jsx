@@ -4,37 +4,51 @@ import AppLayout from '../layouts/AppLayout';
 import FarmerMapView from '../components/FarmerMapView';
 import SearchAndFilterBar from '../components/SearchAndFilterBar';
 import CategoryChips from '../components/CategoryChips';
-import { getApprovedMarketplaceFeed } from '../services/marketplaceService';
+import { getCategories } from '../services/categoryService';
+import { getProductMapListings } from '../services/productService';
 import { getApiErrorMessage } from '../utils/errorHandler';
 
 export default function CustomerMapPage() {
   const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('ALL');
   const [status, setStatus] = useState('ALL');
+  const [location, setLocation] = useState('');
+  const [radiusKm, setRadiusKm] = useState('25');
   const [error, setError] = useState('');
 
   useEffect(() => {
-    (async () => {
+    const load = async () => {
+      setLoading(true);
+      setError('');
       try {
-        setProducts(await getApprovedMarketplaceFeed());
+        const [mapProducts, categoryList] = await Promise.all([
+          getProductMapListings({
+            keyword: search || undefined,
+            categoryId: category !== 'ALL' ? Number(category) : undefined,
+            location: location || undefined,
+            radiusKm: radiusKm ? Number(radiusKm) : undefined
+          }),
+          getCategories()
+        ]);
+        setProducts(mapProducts || []);
+        setCategories(categoryList || []);
       } catch (e) {
         setError(getApiErrorMessage(e, 'Failed to load map listings'));
       } finally {
         setLoading(false);
       }
-    })();
-  }, []);
-
-  const categories = useMemo(() => ['ALL', ...Array.from(new Set(products.map((p) => p.categoryName).filter(Boolean)))], [products]);
+    };
+    load();
+  }, [search, category, location, radiusKm]);
 
   const visible = useMemo(() => products.filter((p) => {
-    if (category !== 'ALL' && p.categoryName !== category) return false;
     if (status === 'READY_NOW' && (p.availabilityStatus || 'AVAILABLE') !== 'AVAILABLE') return false;
     if (status === 'MATURING_SOON' && (p.harvestStatus || '') !== 'IN_FIELD') return false;
-    return `${p.name || ''} ${p.farmerName || ''}`.toLowerCase().includes(search.toLowerCase());
-  }), [products, category, status, search]);
+    return true;
+  }), [products, status]);
 
   return (
     <AppLayout title="Farm Map" subtitle="Find produce near you">
@@ -53,27 +67,41 @@ export default function CustomerMapPage() {
             <div className="rounded-2xl bg-amber-50 px-2 py-2"><p className="text-[11px] text-amber-700">Maturing</p><p className="text-lg font-bold text-amber-800">{visible.filter((p) => (p.harvestStatus || '') === 'IN_FIELD').length}</p></div>
           </div>
         </section>
-        <SearchAndFilterBar value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search farmer or crop">
+        <SearchAndFilterBar value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search Gaborone, vegetables, tomatoes">
           <button onClick={() => setStatus('ALL')} className={`rounded-full px-3 py-1 text-xs ${status === 'ALL' ? 'bg-farm-green text-white' : 'bg-gray-100'}`}>All</button>
           <button onClick={() => setStatus('READY_NOW')} className={`rounded-full px-3 py-1 text-xs ${status === 'READY_NOW' ? 'bg-farm-green text-white' : 'bg-gray-100'}`}>Ready Now</button>
           <button onClick={() => setStatus('MATURING_SOON')} className={`rounded-full px-3 py-1 text-xs ${status === 'MATURING_SOON' ? 'bg-farm-green text-white' : 'bg-gray-100'}`}>Maturing Soon</button>
         </SearchAndFilterBar>
-        <CategoryChips categories={categories} active={category} onChange={setCategory} />
+        <div className="rounded-[24px] bg-white/90 p-3 shadow-soft">
+          <div className="grid grid-cols-2 gap-2">
+            <input className="rounded-2xl border border-emerald-100 px-3 py-2.5 text-sm" placeholder="Location filter" value={location} onChange={(e) => setLocation(e.target.value)} />
+            <input className="rounded-2xl border border-emerald-100 px-3 py-2.5 text-sm" type="number" min="1" placeholder="Radius km" value={radiusKm} onChange={(e) => setRadiusKm(e.target.value)} />
+          </div>
+        </div>
+        <CategoryChips categories={categoryOptions.map((item) => typeof item === 'string' ? item : item.label)} active={category === 'ALL' ? 'ALL' : (categories.find((entry) => String(entry.id) === category)?.name || 'ALL')} onChange={(label) => {
+          if (label === 'ALL') {
+            setCategory('ALL');
+            return;
+          }
+          const match = categories.find((entry) => entry.name === label);
+          setCategory(match ? String(match.id) : 'ALL');
+        }} />
         {error ? <p className="text-sm text-red-600">{error}</p> : null}
         <div className="rounded-[28px] bg-white/90 p-3 shadow-soft">
-          <FarmerMapView products={visible.map((p) => ({ ...p, latitude: p.pickupLatitude ?? p.latitude, longitude: p.pickupLongitude ?? p.longitude }))} height={420} />
+          <FarmerMapView products={visible.map((p) => ({ ...p, latitude: p.latitude, longitude: p.longitude, name: p.productName, locationName: p.location }))} height={420} />
         </div>
         {loading ? null : <div className="space-y-3">
           {visible.slice(0, 6).map((p) => (
-            <div key={p.id} className="rounded-[24px] bg-white/90 p-4 shadow-soft">
+            <div key={p.productId} className="rounded-[24px] bg-white/90 p-4 shadow-soft">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <p className="text-sm font-semibold text-slate-900">{p.name}</p>
-                  <p className="text-xs text-slate-500">{p.farmerName || 'Farmer'} • {p.pickupAddress || p.locationName || 'Unknown location'}</p>
+                  <p className="text-sm font-semibold text-slate-900">{p.productName}</p>
+                  <p className="text-xs text-slate-500">{p.farmerName || 'Farmer'} • {p.location || 'Unknown location'}</p>
                 </div>
                 <span className="rounded-full bg-emerald-50 px-2 py-1 text-[10px] font-semibold text-emerald-700">{(p.harvestStatus || 'READY_NOW').replaceAll('_', ' ')}</span>
               </div>
               <p className="mt-2 text-sm font-semibold text-farm-green">BWP {Number(p.price || 0).toFixed(2)} / {p.unit || 'unit'}</p>
+              <p className="mt-1 text-xs text-slate-500">Quantity: {p.quantity ?? 0} • Category: {p.categoryName || '-'}</p>
             </div>
           ))}
         </div>}

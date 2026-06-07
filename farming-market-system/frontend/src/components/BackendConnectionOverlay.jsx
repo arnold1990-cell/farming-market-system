@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { RefreshCw, ServerOff } from 'lucide-react';
-import api from '../services/api';
+import { verifyBackendConnectivity } from '../services/backendConnectivityService';
 
 const RETRY_INTERVAL_MS = 4000;
 
@@ -13,9 +13,9 @@ export default function BackendConnectionOverlay() {
   const checkBackend = useCallback(async () => {
     setChecking(true);
     try {
-      const response = await api.get('/health');
+      const response = await verifyBackendConnectivity();
       if (!mountedRef.current) return;
-      setIsAvailable(response.status < 500);
+      setIsAvailable(Boolean(response.products?.reachable && response.categories?.reachable));
     } catch {
       if (!mountedRef.current) return;
       setIsAvailable(false);

@@ -1,64 +1,51 @@
-import { Home, Search, ShoppingCart, ClipboardList, User, LayoutDashboard, Package, Users, Truck, Map } from 'lucide-react';
+import { Home, Search, User, CalendarDays, Map } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { getCurrentUser, isAuthenticated } from '../services/authService';
 
-const publicNav = [
-  { path: '/', label: 'Home', icon: Home },
-  { path: '/marketplace', label: 'Market', icon: Search },
-  { path: '/map', label: 'Map', icon: Map },
-  { path: '/cart', label: 'Cart', icon: ShoppingCart, center: true },
-  { path: '/login', label: 'Sign In', icon: User }
-];
+const getHomePath = (user) => {
+  if (!user) return '/';
+  if (user.role === 'FARMER') return '/farmer/dashboard';
+  if (user.role === 'ADMIN') return '/admin/dashboard';
+  if (user.role === 'DELIVERY_AGENT') return '/delivery/dashboard';
+  return '/buyer/dashboard';
+};
 
-const roleNav = {
-  BUYER: [
-    { path: '/buyer/dashboard', label: 'Home', icon: Home },
-    { path: '/marketplace', label: 'Market', icon: Search },
-    { path: '/map', label: 'Map', icon: Map },
-    { path: '/cart', label: 'Cart', icon: ShoppingCart, center: true },
-    { path: '/orders', label: 'Orders', icon: ClipboardList }
-  ],
-  FARMER: [
-    { path: '/farmer/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { path: '/farmer/products', label: 'Produce', icon: Package },
-    { path: '/farmer/orders', label: 'Orders', icon: ShoppingCart },
-    { path: '/farmer/calendar', label: 'Alerts', icon: ClipboardList },
-    { path: '/farmer/profile', label: 'Profile', icon: User }
-  ],
-  ADMIN: [
-    { path: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { path: '/admin/farmers', label: 'Farmers', icon: Users },
-    { path: '/admin/products', label: 'Listings', icon: Package },
-    { path: '/admin/orders', label: 'Orders', icon: ClipboardList },
-    { path: '/admin/users', label: 'Settings', icon: User }
-  ],
-  DELIVERY_AGENT: [
-    { path: '/delivery/dashboard', label: 'Deliveries', icon: Truck }
-  ]
+const getCalendarPath = (user) => {
+  if (!user) return '/calendar';
+  if (user.role === 'FARMER') return '/farmer/calendar';
+  if (user.role === 'ADMIN') return '/admin/dashboard';
+  return '/calendar';
+};
+
+const getProfilePath = (user) => {
+  if (!user) return '/login';
+  if (user.role === 'FARMER') return '/farmer/profile';
+  if (user.role === 'ADMIN') return '/admin/users';
+  if (user.role === 'DELIVERY_AGENT') return '/delivery/dashboard';
+  return '/login';
 };
 
 export default function BottomNavigation({ role = 'BUYER' }) {
   const { pathname } = useLocation();
   const user = getCurrentUser();
-  const items = isAuthenticated() && user ? (roleNav[role] || roleNav.BUYER) : publicNav;
-  const gridColsClass = {
-    1: 'grid-cols-1',
-    2: 'grid-cols-2',
-    3: 'grid-cols-3',
-    4: 'grid-cols-4',
-    5: 'grid-cols-5'
-  }[items.length] || 'grid-cols-4';
+  const items = [
+    { path: getHomePath(isAuthenticated() ? user : null), label: 'Home', icon: Home },
+    { path: '/marketplace', label: 'Market', icon: Search },
+    { path: '/map', label: 'Map', icon: Map, center: true },
+    { path: getCalendarPath(isAuthenticated() ? user : null), label: 'Calendar', icon: CalendarDays },
+    { path: getProfilePath(isAuthenticated() ? user : null), label: 'Profile', icon: User }
+  ];
 
   return (
     <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200/80 bg-white/95 px-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-1 shadow-[0_-10px_30px_rgba(15,23,42,0.10)] backdrop-blur lg:hidden">
-      <div className={`grid ${gridColsClass} items-center`}>
+      <div className="grid grid-cols-5 items-end">
         {items.map((item) => {
           const Icon = item.icon;
           const active = pathname === item.path || (item.path !== '/' && pathname.startsWith(item.path));
           return (
             <Link key={`${role}-${item.label}`} to={item.path} className="min-w-0 px-1 py-1">
-              <span className={`flex flex-col items-center justify-center rounded-2xl px-1 py-2 text-[10px] font-medium transition ${active ? 'bg-farm-mint text-farm-green' : 'text-gray-500'}`}>
-                <span className={`${item.center ? (active ? 'rounded-full bg-farm-green p-2 text-white shadow-lg' : 'rounded-full bg-slate-100 p-2 text-slate-700') : ''}`}><Icon size={17} /></span>
+              <span className={`flex flex-col items-center justify-center rounded-2xl px-1 py-2 text-[10px] font-medium transition ${active && !item.center ? 'bg-farm-mint text-farm-green' : 'text-gray-500'}`}>
+                <span className={`${item.center ? (active ? 'rounded-full bg-farm-green p-3 text-white shadow-lg -translate-y-3' : 'rounded-full bg-farm-green p-3 text-white shadow-lg -translate-y-3') : ''}`}><Icon size={17} /></span>
                 <span className="mt-1 truncate">{item.label}</span>
               </span>
             </Link>

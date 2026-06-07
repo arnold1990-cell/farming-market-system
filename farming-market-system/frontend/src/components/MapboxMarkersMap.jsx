@@ -41,7 +41,15 @@ export default function MapboxMarkersMap({ markers = [], height = 320 }) {
     valid.forEach((m) => {
       const marker = new mapboxgl.Marker().setLngLat([Number(m.longitude), Number(m.latitude)]).addTo(mapRef.current);
       if (m.name || m.locationName) {
-        marker.setPopup(new mapboxgl.Popup({ offset: 20 }).setHTML(`<strong>${m.name || 'Product'}</strong><br/>${m.locationName || ''}`));
+        const lines = [
+          `<strong>${m.name || 'Product'}</strong>`,
+          m.farmerName ? `<div>${m.farmerName}</div>` : '',
+          m.price != null ? `<div>BWP ${Number(m.price).toFixed(2)} / ${m.unit || 'unit'}</div>` : '',
+          m.quantity != null ? `<div>Qty: ${m.quantity}</div>` : '',
+          m.harvestStatus ? `<div>${String(m.harvestStatus).replaceAll('_', ' ')}</div>` : '',
+          m.locationName ? `<div>${m.locationName}</div>` : ''
+        ].filter(Boolean).join('');
+        marker.setPopup(new mapboxgl.Popup({ offset: 20 }).setHTML(lines));
       }
       pinRefs.current.push(marker);
     });

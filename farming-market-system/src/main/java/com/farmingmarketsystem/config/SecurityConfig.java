@@ -30,14 +30,18 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/api/auth/register", "/api/auth/login", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/ussd", "/api/ussd/product").permitAll()
                         .requestMatchers("/api/payments/orange-money/callback", "/api/payments/myzaka/callback").permitAll()
                         .requestMatchers(HttpMethod.GET,
                                 "/api/health",
                                 "/api/farmers",
+                                "/api/farmers/map",
+                                "/api/farmers/nearby",
                                 "/api/farmers/public/**",
                                 "/api/public/**",
                                 "/api/marketplace/**",
                                 "/api/products",
+                                "/api/products/map",
                                 "/api/products/**",
                                 "/api/categories",
                                 "/api/categories/**",
@@ -50,6 +54,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT, "/api/products/*", "/api/farmer/products/*").hasAnyRole("FARMER", "ADMIN")
                         .requestMatchers(HttpMethod.PATCH, "/api/products/*/availability", "/api/farmer/products/*/availability", "/api/products/*/images/reorder", "/api/products/images/*").hasAnyRole("FARMER", "ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/products/*", "/api/farmer/products/*", "/api/products/images/*").hasAnyRole("FARMER", "ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/location/update").hasAnyRole("FARMER", "ADMIN")
                         .requestMatchers("/api/farmer/**", "/api/products/my-products", "/api/products/farmer/dashboard", "/api/orders/farmer", "/api/products/*/orders", "/api/payments/cash/**").hasAnyRole("FARMER","ADMIN")
                         .requestMatchers("/api/delivery/agent/**").hasRole("DELIVERY_AGENT")
                         .requestMatchers("/api/payments/mock/**").hasRole("ADMIN")

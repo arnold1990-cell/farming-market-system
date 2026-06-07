@@ -6,8 +6,13 @@ export default function FarmerMapView({ products = [], height = 320 }) {
     .map((p) => ({
       latitude: p.latitude,
       longitude: p.longitude,
-      name: p.name,
-      locationName: p.locationName || p.pickupAddress || ''
+      name: p.name || p.productName,
+      farmerName: p.farmerName,
+      price: p.price,
+      quantity: p.quantity,
+      unit: p.unit,
+      harvestStatus: p.harvestStatus,
+      locationName: p.locationName || p.pickupAddress || p.location || ''
     }));
 
   return <MapboxMarkersMap markers={markers} height={height} />;

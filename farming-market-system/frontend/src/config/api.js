@@ -1,4 +1,4 @@
-const DEVELOPMENT_API_FALLBACK = 'http://localhost:8080/api';
+const DEVELOPMENT_API_FALLBACK = '/api';
 
 const trimSlashes = (value) => String(value || '').trim().replace(/\/+$/, '');
 
