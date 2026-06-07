@@ -1,0 +1,16 @@
+[Unit]
+Description=Pula Harvest Spring Boot Backend
+After=network.target
+
+[Service]
+Type=simple
+User=ubuntu
+WorkingDirectory=/opt/pula-harvest/backend
+EnvironmentFile=/opt/pula-harvest/backend/.env
+ExecStart=/usr/bin/java -jar /opt/pula-harvest/backend/farming-market-system-0.0.1-SNAPSHOT.jar
+SuccessExitStatus=143
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
