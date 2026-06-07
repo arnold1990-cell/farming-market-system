@@ -6,12 +6,12 @@ services:
     restart: unless-stopped
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-farming_market}
-      POSTGRES_USER: ${POSTGRES_USER:-farming_user}
+      POSTGRES_USER: ${POSTGRES_USER:postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-farming_user} -d ${POSTGRES_DB:-farming_market}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:postgres} -d ${POSTGRES_DB:-farming_market}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -23,7 +23,7 @@ services:
     restart: unless-stopped
     environment:
       DB_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-farming_market}
-      DB_USERNAME: ${POSTGRES_USER:-farming_user}
+      DB_USERNAME: ${POSTGRES_USER:postgres}
       DB_PASSWORD: ${POSTGRES_PASSWORD}
       JWT_SECRET: ${JWT_SECRET}
       SERVER_PORT: 8080
