@@ -26,7 +26,10 @@ html {
 
 body {
   @apply bg-farm-gray text-farm-charcoal;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: 'Avenir Next', 'Trebuchet MS', 'Segoe UI', sans-serif;
+  background:
+    radial-gradient(circle at top, rgba(107, 161, 93, 0.16), transparent 28rem),
+    linear-gradient(180deg, #f6f8f2 0%, #eef3e9 45%, #f7faf5 100%);
 }
 
 img {
@@ -49,4 +52,17 @@ main, section, article, div {
 
 .badge {
   @apply rounded-full px-2 py-1 text-xs font-medium;
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(14px);
+}
+
+.section-title {
+  @apply text-base font-bold text-slate-900;
+}
+
+.section-subtitle {
+  @apply text-xs text-slate-500;
 }

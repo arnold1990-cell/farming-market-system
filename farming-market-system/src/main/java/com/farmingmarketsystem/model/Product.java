@@ -5,6 +5,7 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.LocalDate;
 
 @Entity
 @Getter
@@ -72,6 +73,7 @@ public class Product {
     @Enumerated(EnumType.STRING)
     @Builder.Default
     private HarvestStatus harvestStatus = HarvestStatus.IN_FIELD;
+    private LocalDate harvestReadyDate;
 
     @ManyToOne(optional = false)
     private Category category;

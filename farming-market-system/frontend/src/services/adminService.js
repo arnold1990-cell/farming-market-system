@@ -46,7 +46,7 @@ export const approveFarmer = async (id) => {
   try {
     return (await api.patch(`/admin/farmers/${id}/approve`)).data;
   } catch {
-    return { success: true, message: 'Approve endpoint not available in current backend' };
+    return (await api.patch(`/users/${id}/enable`)).data;
   }
 };
 
@@ -59,7 +59,7 @@ export const suspendFarmer = async (id) => {
 };
 
 export const deleteFarmer = async (id) => {
-  return (await api.delete(`/admin/farmers/${id}`)).data;
+  return (await api.delete(`/users/${id}`)).data;
 };
 
 export const getDashboardStats = async () => {

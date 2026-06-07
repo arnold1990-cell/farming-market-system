@@ -22,7 +22,7 @@ const harvestStatuses = ['IN_FIELD', 'HARVESTED', 'PACKAGED', 'READY_FOR_DELIVER
 
 const initialForm = {
   name: '', description: '', categoryId: '', price: '', currency: 'BWP', quantity: '', unit: 'kg',
-  locationName: '', latitude: '', longitude: '', pickupAddress: '', pickupLatitude: '', pickupLongitude: '', city: '', country: '', harvestStatus: 'IN_FIELD', availabilityStatus: 'AVAILABLE', available: true, organic: false, deliveryAvailable: false,
+  locationName: '', latitude: '', longitude: '', pickupAddress: '', pickupLatitude: '', pickupLongitude: '', city: '', country: '', harvestStatus: 'IN_FIELD', harvestReadyDate: '', availabilityStatus: 'AVAILABLE', available: true, organic: false, deliveryAvailable: false,
   imageUrl: ''
 };
 
@@ -142,6 +142,7 @@ export default function FarmerProductsPage() {
         price: Number(form.price),
         quantity: Number(form.quantity),
         categoryId: parsedCategoryId,
+        harvestReadyDate: form.harvestReadyDate || null,
         latitude: form.latitude === '' ? null : Number(form.latitude),
         longitude: form.longitude === '' ? null : Number(form.longitude),
         pickupLatitude: form.pickupLatitude === '' ? null : Number(form.pickupLatitude),
@@ -178,7 +179,7 @@ export default function FarmerProductsPage() {
       imageUrl: p.imageUrl || '', categoryId: p.categoryId || '', locationName: p.locationName || '', latitude: p.latitude ?? '', longitude: p.longitude ?? '',
       pickupAddress: p.pickupAddress || '', pickupLatitude: p.pickupLatitude ?? p.latitude ?? '', pickupLongitude: p.pickupLongitude ?? p.longitude ?? '',
       city: '', country: '',
-      currency: p.currency || 'BWP', harvestStatus: p.harvestStatus || 'IN_FIELD', availabilityStatus: p.availabilityStatus || (p.available ? 'AVAILABLE' : 'OUT_OF_STOCK'), available: !!p.available, organic: !!p.organic, deliveryAvailable: !!p.deliveryAvailable
+      currency: p.currency || 'BWP', harvestStatus: p.harvestStatus || 'IN_FIELD', harvestReadyDate: p.harvestReadyDate || '', availabilityStatus: p.availabilityStatus || (p.available ? 'AVAILABLE' : 'OUT_OF_STOCK'), available: !!p.available, organic: !!p.organic, deliveryAvailable: !!p.deliveryAvailable
     });
     setStep(1);
     setOpen(true);
@@ -268,6 +269,7 @@ export default function FarmerProductsPage() {
             <Select value={form.categoryId} onChange={(e) => setForm({ ...form, categoryId: e.target.value })}><option value="">Category</option>{categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}</Select>
             {categories.length === 0 ? <p className='text-xs text-amber-600'>No categories available yet. Contact admin or refresh after server starts seeding defaults.</p> : null}
             <Select value={form.harvestStatus} onChange={(e) => setForm({ ...form, harvestStatus: e.target.value })}>{harvestStatuses.map(s => <option key={s}>{s}</option>)}</Select>
+            <Input placeholder="Harvest / market ready date" type="date" value={form.harvestReadyDate} onChange={(e) => setForm({ ...form, harvestReadyDate: e.target.value })} />
           </>}
           {step === 2 && <>
             <Input placeholder="Price" type="number" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} />
@@ -318,6 +320,7 @@ export default function FarmerProductsPage() {
               <p><b>Stock:</b> {form.quantity}</p>
               <p><b>Pickup Location:</b> {form.pickupAddress || form.locationName || '-'} ({form.pickupLatitude || '-'}, {form.pickupLongitude || '-'})</p>
               <p><b>Harvest:</b> {form.harvestStatus}</p>
+              <p><b>Ready Date:</b> {form.harvestReadyDate || '-'}</p>
               <p><b>Images:</b> Field {fieldFiles.length}, Harvest {harvestFiles.length}, Product {productFiles.length}, Packaging {packagingFiles.length}</p>
             </div>
           </>}

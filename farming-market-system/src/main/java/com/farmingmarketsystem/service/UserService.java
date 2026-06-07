@@ -17,4 +17,6 @@ public class UserService {
     public List<UserDtos.PublicFarmerResponse> getPublicFarmers() { return userRepository.findByRoleAndEnabledTrue(Role.FARMER).stream().map(u -> new UserDtos.PublicFarmerResponse(u.getId(), u.getFullName())).toList(); }
     public UserDtos.UserResponse getByEmail(String email) { var u=userRepository.findByEmail(email).orElseThrow(() -> new ResourceNotFoundException("User not found")); return new UserDtos.UserResponse(u.getId(), u.getFullName(), u.getEmail(), u.getRole().name(), u.isEnabled()); }
     public UserDtos.UserResponse disable(Long userId) { var u=userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User not found")); u.setEnabled(false); userRepository.save(u); return new UserDtos.UserResponse(u.getId(), u.getFullName(), u.getEmail(), u.getRole().name(), u.isEnabled()); }
+    public UserDtos.UserResponse enable(Long userId) { var u=userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User not found")); u.setEnabled(true); userRepository.save(u); return new UserDtos.UserResponse(u.getId(), u.getFullName(), u.getEmail(), u.getRole().name(), u.isEnabled()); }
+    public void delete(Long userId) { var u=userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User not found")); userRepository.delete(u); }
 }

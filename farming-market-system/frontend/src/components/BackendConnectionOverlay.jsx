@@ -40,25 +40,24 @@ export default function BackendConnectionOverlay() {
   if (!hasCheckedOnce || isAvailable) return null;
 
   return (
-    <div className="fixed inset-x-0 top-0 z-[70] flex justify-center px-3 py-2">
-      <div className="w-full max-w-4xl rounded-xl border border-amber-300 bg-amber-50 px-3 py-2 text-amber-900 shadow-md">
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex min-w-0 items-start gap-2">
-            <ServerOff size={16} className="mt-0.5 shrink-0" />
-            <p className="text-sm font-medium leading-5">
-              Backend is offline. Some live data may be unavailable.
-            </p>
+    <div className="fixed right-4 top-4 z-[70] max-w-[18rem]">
+      <div className="rounded-2xl border border-amber-200 bg-amber-50/95 px-3 py-2 text-amber-900 shadow-lg backdrop-blur">
+        <div className="flex items-start gap-2">
+          <ServerOff size={16} className="mt-0.5 shrink-0" />
+          <div className="min-w-0">
+            <p className="text-xs font-semibold">Live backend unreachable</p>
+            <p className="mt-0.5 text-[11px] leading-4 text-amber-800">Marketplace data may be delayed until `/api` responds again.</p>
           </div>
-          <button
-            type="button"
-            onClick={checkBackend}
-            className="inline-flex w-full items-center justify-center gap-1 rounded-md border border-amber-400 bg-white px-2 py-1 text-xs font-semibold text-amber-900 hover:bg-amber-100 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto sm:shrink-0"
-            disabled={checking}
-          >
-            <RefreshCw size={14} className={checking ? 'animate-spin' : ''} />
-            Retry connection
-          </button>
         </div>
+        <button
+          type="button"
+          onClick={checkBackend}
+          className="mt-2 inline-flex items-center gap-1 rounded-full border border-amber-300 bg-white px-3 py-1 text-[11px] font-semibold text-amber-900 hover:bg-amber-100 disabled:cursor-not-allowed disabled:opacity-60"
+          disabled={checking}
+        >
+          <RefreshCw size={13} className={checking ? 'animate-spin' : ''} />
+          Retry
+        </button>
       </div>
     </div>
   );

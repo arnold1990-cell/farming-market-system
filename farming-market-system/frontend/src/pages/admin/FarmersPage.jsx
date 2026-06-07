@@ -29,11 +29,6 @@ const links = [
   { path: '/admin/deliveries', label: 'Deliveries' }
 ];
 
-const mockFarmers = [
-  { id: 1, fullName: 'Kagiso Molefe', email: 'kagiso@farm.com', phoneNumber: '+267 71000001', farmName: 'Green Valley Farm', location: 'Gaborone', description: 'Organic vegetables', productsCount: 18, totalSales: 12450, status: 'ACTIVE', joinedDate: '2025-11-02', recentProducts: ['Tomatoes', 'Cabbage'], recentOrders: ['#1012', '#1018'] },
-  { id: 2, fullName: 'Neo Dube', email: 'neo@farm.com', phoneNumber: '+267 71000002', farmName: 'Sunrise Orchards', location: 'Lobatse', description: 'Seasonal fruits', productsCount: 9, totalSales: 7840, status: 'PENDING', joinedDate: '2026-01-15', recentProducts: ['Oranges', 'Mangoes'], recentOrders: ['#1034'] }
-];
-
 const statusMap = { ACTIVE: 'COMPLETED', PENDING: 'PENDING', SUSPENDED: 'CANCELLED' };
 
 export default function FarmersPage() {
@@ -97,10 +92,10 @@ export default function FarmersPage() {
         recentProducts: f.recentProducts || [],
         recentOrders: f.recentOrders || []
       }));
-      setFarmers(normalized.length ? normalized : mockFarmers);
-    } catch {
-      setFarmers(mockFarmers);
-      setError('Using fallback mock data. Backend farmers endpoint unavailable.');
+      setFarmers(normalized);
+    } catch (e) {
+      setFarmers([]);
+      setError(getApiErrorMessage(e, 'Could not load farmers.'));
     } finally {
       setLoading(false);
     }
@@ -216,7 +211,7 @@ export default function FarmersPage() {
     { key: 'location', title: 'Location' },
     { key: 'phoneNumber', title: 'Contact' },
     { key: 'productsCount', title: 'Products' },
-    { key: 'totalSales', title: 'Total Sales', render: (r) => `$${Number(r.totalSales || 0).toLocaleString()}` },
+    { key: 'totalSales', title: 'Total Sales', render: (r) => `BWP ${Number(r.totalSales || 0).toLocaleString()}` },
     { key: 'status', title: 'Status', render: (r) => <StatusBadge status={statusMap[r.status] || 'PENDING'} /> },
     { key: 'joinedDate', title: 'Joined Date' },
     {
@@ -242,12 +237,22 @@ export default function FarmersPage() {
   return (
     <AppLayout links={links}>
       <div className="space-y-5">
+        <section className="rounded-[30px] bg-white/90 p-4 shadow-soft">
+          <div className="flex flex-col gap-3">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-700">Farmer moderation</p>
+              <h1 className="text-2xl font-black text-slate-900">Approve growers and watch marketplace quality</h1>
+              <p className="mt-1 text-sm text-slate-500">Use live user data only. This screen no longer falls back to mock farmers when an endpoint fails.</p>
+            </div>
+            <Button className="flex items-center gap-2 self-start" onClick={() => setAddOpen(true)}><Plus size={16} />Add Farmer</Button>
+          </div>
+        </section>
+
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
           <div>
-            <h1 className="text-2xl font-bold">Farmers</h1>
+            <h2 className="text-xl font-bold">Farmers</h2>
             <p className="text-sm text-gray-500">Manage farmer profiles, approvals, and marketplace activity</p>
           </div>
-          <Button className="flex items-center gap-2" onClick={() => setAddOpen(true)}><Plus size={16} />Add Farmer</Button>
         </div>
 
         {notice && <div className="card p-3 text-sm text-green-700 bg-green-50">{notice}</div>}
@@ -306,7 +311,7 @@ export default function FarmersPage() {
                     <p>{f.phoneNumber}</p>
                     <p className="text-gray-600">{f.email}</p>
                     <p>Products: {f.productsCount}</p>
-                    <p>Sales: ${Number(f.totalSales || 0).toLocaleString()}</p>
+                    <p>Sales: BWP {Number(f.totalSales || 0).toLocaleString()}</p>
                     <StatusBadge status={statusMap[f.status] || 'PENDING'} />
                   </div>
                   <div className="grid grid-cols-4 gap-2">
@@ -332,7 +337,7 @@ export default function FarmersPage() {
             <p><span className="font-medium">Location:</span> {selectedFarmer.location || '-'}</p>
             <p><span className="font-medium">Description:</span> {selectedFarmer.description || '-'}</p>
             <p><span className="font-medium">Products Count:</span> {selectedFarmer.productsCount || 0}</p>
-            <p><span className="font-medium">Total Sales:</span> ${Number(selectedFarmer.totalSales || 0).toLocaleString()}</p>
+            <p><span className="font-medium">Total Sales:</span> BWP {Number(selectedFarmer.totalSales || 0).toLocaleString()}</p>
             <p><span className="font-medium">Status:</span> <StatusBadge status={statusMap[selectedFarmer.status] || 'PENDING'} /></p>
             <p><span className="font-medium">Joined:</span> {selectedFarmer.joinedDate || '-'}</p>
             <p><span className="font-medium">Recent Products:</span> {(selectedFarmer.recentProducts || []).join(', ') || '-'}</p>

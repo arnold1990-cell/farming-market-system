@@ -28,6 +28,7 @@ export const routes = [
   { path: '/login', element: <LoginPage /> },
   { path: '/register', element: <RegisterPage /> },
   { path: '/marketplace', element: <MarketplacePage /> },
+  { path: '/map', element: <CustomerMapPage /> },
   { path: '/products/:id', element: <ProductDetailsPage /> },
 
   { path: '/cart', element: <CartPage /> },

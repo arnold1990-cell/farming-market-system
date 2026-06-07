@@ -68,6 +68,7 @@ class ProductServiceCategoryValidationTest {
                 null,
                 null,
                 null,
+                null,
                 true,
                 false,
                 false,

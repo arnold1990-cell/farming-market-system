@@ -8,6 +8,7 @@ import jakarta.validation.constraints.*;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.List;
 
 public class ProductDtos {
@@ -26,6 +27,7 @@ public class ProductDtos {
             @DecimalMin("-90.0") @DecimalMax("90.0") BigDecimal pickupLatitude,
             @DecimalMin("-180.0") @DecimalMax("180.0") BigDecimal pickupLongitude,
             HarvestStatus harvestStatus,
+            LocalDate harvestReadyDate,
             AvailabilityStatus availabilityStatus,
             Boolean featured,
             Boolean available,
@@ -49,6 +51,7 @@ public class ProductDtos {
             @DecimalMin("-90.0") @DecimalMax("90.0") BigDecimal pickupLatitude,
             @DecimalMin("-180.0") @DecimalMax("180.0") BigDecimal pickupLongitude,
             HarvestStatus harvestStatus,
+            LocalDate harvestReadyDate,
             AvailabilityStatus availabilityStatus,
             Boolean featured,
             Boolean available,
@@ -83,6 +86,7 @@ public class ProductDtos {
             BigDecimal pickupLatitude,
             BigDecimal pickupLongitude,
             HarvestStatus harvestStatus,
+            LocalDate harvestReadyDate,
             AvailabilityStatus availabilityStatus,
             boolean featured,
             Instant createdAt,

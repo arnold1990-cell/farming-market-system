@@ -103,6 +103,7 @@ public class ProductService {
                 .pickupLatitude(effectiveLat)
                 .pickupLongitude(effectiveLng)
                 .harvestStatus(req.harvestStatus() != null ? req.harvestStatus() : HarvestStatus.IN_FIELD)
+                .harvestReadyDate(req.harvestReadyDate())
                 .availabilityStatus(status)
                 .featured(req.featured() != null && req.featured())
                 .available(status == AvailabilityStatus.AVAILABLE)
@@ -141,6 +142,7 @@ public class ProductService {
         p.setPickupLatitude(effectiveLat);
         p.setPickupLongitude(effectiveLng);
         p.setHarvestStatus(req.harvestStatus() != null ? req.harvestStatus() : HarvestStatus.IN_FIELD);
+        p.setHarvestReadyDate(req.harvestReadyDate());
         p.setAvailabilityStatus(status);
         p.setFeatured(req.featured() != null && req.featured());
         p.setAvailable(status == AvailabilityStatus.AVAILABLE);
@@ -302,6 +304,7 @@ public class ProductService {
                 p.getPickupLatitude(),
                 p.getPickupLongitude(),
                 p.getHarvestStatus(),
+                p.getHarvestReadyDate(),
                 p.getAvailabilityStatus(),
                 p.isFeatured(),
                 p.getCreatedAt(),
