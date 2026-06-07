@@ -1,4 +1,4 @@
-import { withApiBase } from '../config/api';
+import api from './api';
 
 const probeTargets = [
   { key: 'auth', path: '/api/auth/login', method: 'GET' },
@@ -9,11 +9,11 @@ const probeTargets = [
 ];
 
 async function probe({ path, method = 'GET', body }) {
-  const response = await fetch(withApiBase(path), {
+  const response = await api.request({
+    url: path,
     method,
-    cache: 'no-store',
-    headers: body ? { 'Content-Type': 'application/json' } : undefined,
-    body
+    data: body,
+    headers: body ? { 'Content-Type': 'application/json' } : undefined
   });
   return { reachable: true, status: response.status };
 }

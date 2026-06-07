@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { RefreshCw, ServerOff } from 'lucide-react';
-import { BACKEND_HEALTHCHECK_URL } from '../config/api';
+import api from '../services/api';
 
 const RETRY_INTERVAL_MS = 4000;
 
@@ -13,7 +13,7 @@ export default function BackendConnectionOverlay() {
   const checkBackend = useCallback(async () => {
     setChecking(true);
     try {
-      const response = await fetch(BACKEND_HEALTHCHECK_URL, { cache: 'no-store' });
+      const response = await api.get('/health');
       if (!mountedRef.current) return;
       setIsAvailable(response.status < 500);
     } catch {
