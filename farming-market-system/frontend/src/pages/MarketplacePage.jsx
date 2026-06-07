@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { MapPinned } from 'lucide-react';
 import AppLayout from '../layouts/AppLayout';
 import ProductCard from '../components/ProductCard';
 import CategoryChip from '../components/CategoryChip';
@@ -87,7 +88,7 @@ export default function MarketplacePage() {
           <h1 className="text-xl font-black text-slate-900">Marketplace feed</h1>
           <p className="mt-1 text-sm text-slate-500">Track harvest readiness, compare BWP pricing, and locate farmers before ordering.</p>
         </div>
-        <Link to="/map" className="rounded-2xl bg-farm-mint px-3 py-2 text-xs font-semibold text-farm-green">Open map</Link>
+        <Link to="/map" className="inline-flex items-center gap-1 rounded-2xl bg-farm-mint px-3 py-2 text-xs font-semibold text-farm-green"><MapPinned size={14} />Open map</Link>
       </div>
       <div className="mt-4 grid grid-cols-3 gap-2 text-center">
         <div className="rounded-2xl bg-emerald-50 px-2 py-2"><p className="text-[11px] text-emerald-700">Listings</p><p className="text-lg font-bold text-emerald-800">{readinessCount.all}</p></div>
@@ -114,6 +115,6 @@ export default function MarketplacePage() {
       </div>
       <button className="mt-3 rounded-full border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-600" onClick={onResetFilters}>Reset filters</button>
     </div>
-    {loading ? <LoadingSpinner /> : error ? <div className="space-y-3"><EmptyState title="Could not load products" subtitle="Could not load products. Please try again." /><div className="flex justify-center"><button type="button" className="rounded-xl border px-4 py-2 text-sm font-semibold" onClick={load}>Refresh</button></div></div> : filtered.length === 0 ? <EmptyState title="No products" subtitle="No products found." /> : <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">{filtered.map((p) => <ProductCard key={p.id} product={{ ...p, stock: p.quantity, farmer: p.farmerName || 'Farmer', image: p.imageUrl ? toMediaUrl(p.imageUrl) : fallbackImage, location: p.pickupAddress || p.locationName || 'Unknown', availabilityStatus: filters.availability === 'IN_FIELD' ? 'AVAILABLE' : (p.availabilityStatus || 'AVAILABLE') }} onAdd={() => onAdd(p)} />)}</div>}
+    {loading ? <LoadingSpinner /> : error ? <div className="space-y-3"><EmptyState title="Could not load products" subtitle="Could not load products. Please try again." /><div className="flex justify-center"><button type="button" className="rounded-xl border px-4 py-2 text-sm font-semibold" onClick={load}>Refresh</button></div></div> : filtered.length === 0 ? <EmptyState title="No products" subtitle="No products found." /> : <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">{filtered.map((p) => <ProductCard key={p.id} product={{ ...p, stock: p.quantity, farmer: p.farmerName || 'Farmer', image: p.imageUrl ? toMediaUrl(p.imageUrl) : fallbackImage, location: p.pickupAddress || p.locationName || 'Unknown', availabilityStatus: p.availabilityStatus || 'AVAILABLE' }} onAdd={() => onAdd(p)} />)}</div>}
   </div></AppLayout>;
 }

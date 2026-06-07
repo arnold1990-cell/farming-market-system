@@ -1,8 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { CalendarClock, MapPin, Star, Truck } from 'lucide-react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { ArrowLeft, CalendarClock, Heart, MapPin, MoreHorizontal, Star, Truck } from 'lucide-react';
 import AppLayout from '../layouts/AppLayout';
-import Button from '../components/Button';
 import LoadingSpinner from '../components/LoadingSpinner';
 import EmptyState from '../components/EmptyState';
 import MapboxMarkersMap from '../components/MapboxMarkersMap';
@@ -17,6 +16,7 @@ const fallbackImage = 'https://images.unsplash.com/photo-1542838132-92c53300491e
 
 export default function ProductDetailsPage() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [product, setProduct] = useState(null);
   const [reviews, setReviews] = useState([]);
   const [quantity, setQuantity] = useState(1);
@@ -36,25 +36,28 @@ export default function ProductDetailsPage() {
       setLoading(true);
       setError('');
       try {
-        const [pRes, reviewRes] = await Promise.all([
+        const [productResponse, reviewResponse] = await Promise.all([
           getPublicProductById(id),
           api.get(`/reviews/products/${id}`).then((r) => r.data).catch(() => [])
         ]);
-        setProduct(pRes);
-        setReviews(reviewRes || []);
+        setProduct(productResponse);
+        setReviews(reviewResponse || []);
       } catch (err) {
         setError(getApiErrorMessage(err, 'Failed to load product'));
       } finally {
         setLoading(false);
       }
     };
+
     load();
   }, [id]);
 
   const orderedImages = useMemo(() => {
     if (!product?.images?.length) return [];
     const order = { PRODUCT: 0, FIELD: 1, HARVEST: 2, PACKAGING: 3 };
-    return [...product.images].sort((a, b) => (order[a.imageType] ?? 99) - (order[b.imageType] ?? 99) || (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
+    return [...product.images].sort(
+      (a, b) => (order[a.imageType] ?? 99) - (order[b.imageType] ?? 99) || (a.sortOrder ?? 0) - (b.sortOrder ?? 0)
+    );
   }, [product]);
 
   useEffect(() => {
@@ -79,7 +82,169 @@ export default function ProductDetailsPage() {
   const destinationUrl = hasPickupCoords ? `https://www.google.com/maps/dir/?api=1&destination=${product.pickupLatitude},${product.pickupLongitude}` : null;
   const addressText = product.pickupAddress || product.locationName || '-';
   const isAvailable = (product.availabilityStatus || 'AVAILABLE') === 'AVAILABLE';
-  const harvestDateText = product.harvestReadyDate ? new Date(product.harvestReadyDate).toLocaleDateString('en-BW', { year: 'numeric', month: 'short', day: 'numeric' }) : null;
+  const harvestDateText = product.harvestReadyDate
+    ? new Date(product.harvestReadyDate).toLocaleDateString('en-BW', { year: 'numeric', month: 'short', day: 'numeric' })
+    : null;
 
-  return <AppLayout title="Product details"><ToastStack toasts={toasts} onClose={(tid) => setToasts((prev) => prev.filter((t) => t.id !== tid))} /><div className="space-y-4 pb-20"><div className="rounded-2xl bg-white p-3 shadow-soft"><img src={activeImage || fallbackImage} onError={(e) => { e.currentTarget.src = fallbackImage; }} className="h-64 w-full rounded-xl object-cover" /><div className="mt-3 grid grid-cols-4 gap-2 sm:grid-cols-6">{(orderedImages.length ? orderedImages : [{ id: 'single', imageUrl: product.imageUrl }]).map((img) => <button type="button" key={img.id} onClick={() => setActiveImage(toMediaUrl(img.imageUrl || fallbackImage))} className="w-full"><img src={toMediaUrl(img.imageUrl || fallbackImage)} onError={(e) => { e.currentTarget.src = fallbackImage; }} className="h-14 w-full rounded-lg border object-cover" /></button>)}</div></div><div className="rounded-2xl bg-white p-4 shadow-soft"><h1 className="text-xl font-bold">{product.name}</h1><p className="mt-1 text-sm text-gray-600">{product.description}</p><p className="mt-2 text-2xl font-bold text-farm-green">BWP {Number(product.price).toFixed(2)}/{product.unit}</p><div className="mt-2 flex flex-wrap items-center gap-3 text-xs text-gray-600"><span className="inline-flex items-center gap-1"><MapPin size={13} />{addressText}</span><span className="inline-flex items-center gap-1"><Star size={13} className="fill-yellow-400 text-yellow-400" />{product.averageRating ? Number(product.averageRating).toFixed(1) : 'N/A'}</span><span className="inline-flex items-center gap-1"><Truck size={13} />{isAvailable ? 'Available' : 'Unavailable'}</span>{harvestDateText ? <span className="inline-flex items-center gap-1"><CalendarClock size={13} />{harvestDateText}</span> : null}</div><p className="mt-2 text-xs text-gray-500">Farmer: {product.farmerName || '-'} | Stock: {product.quantity}</p><div className="mt-3 flex gap-2"><button type="button" className="rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs font-semibold text-farm-green">Call farmer placeholder</button><button type="button" className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-600">Message placeholder</button></div></div><div className="rounded-2xl bg-white p-4 shadow-soft"><h3 className="mb-2 text-sm font-semibold">Pickup Location</h3>{hasPickupCoords ? <MapboxMarkersMap markers={[{ latitude: product.pickupLatitude, longitude: product.pickupLongitude, name: product.name, locationName: addressText }]} height={240} /> : <p className="text-sm text-amber-700">GPS coordinates missing.</p>}<div className="mt-2 flex items-center justify-between text-xs text-gray-600"><span>{addressText}</span>{destinationUrl ? <a href={destinationUrl} target="_blank" rel="noreferrer" className="font-semibold text-farm-green">Get Directions</a> : null}</div></div><div className="rounded-2xl bg-white p-4 shadow-soft"><h3 className="font-semibold">Reviews</h3>{reviews.length === 0 ? <p className="text-sm text-gray-500">No reviews yet.</p> : <div className="mt-2 space-y-2">{reviews.map((r) => <div key={r.id} className="rounded-xl border border-gray-100 p-3"><p className="text-sm font-medium">Rating: {r.rating}/5</p><p className="text-xs text-gray-600">{r.comment || 'No comment'}</p></div>)}</div>}</div></div><div className="fixed bottom-16 left-0 right-0 z-30 border-t border-gray-200 bg-white/95 p-3 backdrop-blur lg:bottom-0"><div className="mx-auto flex max-w-6xl items-center gap-2"><div className="flex items-center overflow-hidden rounded-xl border border-gray-200"><button className="px-3 py-2" onClick={() => setQuantity((q) => Math.max(1, q - 1))}>-</button><input type="number" min="1" max={product.quantity || 1} value={quantity} onChange={(e) => setQuantity(Math.max(1, Number(e.target.value) || 1))} className="w-14 border-x border-gray-200 py-2 text-center text-sm" /><button className="px-3 py-2" onClick={() => setQuantity((q) => q + 1)}>+</button></div><Button className="flex-1" onClick={onAdd} disabled={!isAvailable}>{isAvailable ? 'Add to Cart' : 'Unavailable'}</Button></div></div></AppLayout>;
+  return (
+    <AppLayout title="Product details" hideHeader>
+      <ToastStack toasts={toasts} onClose={(tid) => setToasts((prev) => prev.filter((t) => t.id !== tid))} />
+      <div className="space-y-4 pb-24">
+        <section className="space-y-4 rounded-[32px] bg-white p-3 shadow-soft">
+          <div className="flex items-center justify-between px-1 pt-1">
+            <button
+              type="button"
+              onClick={() => navigate(-1)}
+              className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#EFF8F1] text-slate-800"
+            >
+              <ArrowLeft size={18} />
+            </button>
+            <div className="flex items-center gap-2">
+              <button type="button" className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#EFF8F1] text-slate-700">
+                <Heart size={18} />
+              </button>
+              <button type="button" className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#EFF8F1] text-slate-700">
+                <MoreHorizontal size={18} />
+              </button>
+            </div>
+          </div>
+
+          <div className="rounded-[28px] bg-gradient-to-b from-[#EAF7ED] to-[#F7FBF8] p-3">
+            <img
+              src={activeImage || fallbackImage}
+              onError={(e) => {
+                e.currentTarget.src = fallbackImage;
+              }}
+              className="h-72 w-full rounded-[24px] object-cover"
+            />
+          </div>
+
+          <div className="grid grid-cols-4 gap-2">
+            {(orderedImages.length ? orderedImages : [{ id: 'single', imageUrl: product.imageUrl }]).map((img) => (
+              <button
+                type="button"
+                key={img.id}
+                onClick={() => setActiveImage(toMediaUrl(img.imageUrl || fallbackImage))}
+                className="rounded-[18px] bg-[#F5F8F6] p-1.5"
+              >
+                <img
+                  src={toMediaUrl(img.imageUrl || fallbackImage)}
+                  onError={(e) => {
+                    e.currentTarget.src = fallbackImage;
+                  }}
+                  className="h-14 w-full rounded-[14px] object-cover"
+                />
+              </button>
+            ))}
+          </div>
+        </section>
+
+        <section className="rounded-[30px] bg-white p-5 shadow-soft">
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.25em] text-emerald-500">Pula Harvest</p>
+              <h1 className="mt-2 text-2xl font-black text-slate-900">{product.name}</h1>
+              <p className="mt-1 text-sm text-slate-500">{product.farmerName || 'Farmer'} - {addressText}</p>
+            </div>
+            <span className="rounded-full bg-amber-50 px-3 py-1.5 text-xs font-semibold text-amber-700">
+              <span className="inline-flex items-center gap-1">
+                <Star size={12} className="fill-amber-400 text-amber-400" />
+                {product.averageRating ? Number(product.averageRating).toFixed(1) : '4.8'}
+              </span>
+            </span>
+          </div>
+
+          <div className="mt-4 flex items-end justify-between gap-3">
+            <div>
+              <p className="text-3xl font-black text-farm-green">BWP {Number(product.price).toFixed(2)}</p>
+              <p className="text-xs text-slate-500">per {product.unit || 'unit'}</p>
+            </div>
+            <div className="flex items-center rounded-full border border-emerald-100 bg-[#F5FBF6] px-1 py-1">
+              <button type="button" className="h-9 w-9 rounded-full text-lg text-slate-700" onClick={() => setQuantity((q) => Math.max(1, q - 1))}>-</button>
+              <span className="min-w-[2.5rem] text-center text-sm font-semibold text-slate-900">{quantity}</span>
+              <button
+                type="button"
+                className="h-9 w-9 rounded-full bg-farm-green text-lg text-white"
+                onClick={() => setQuantity((q) => Math.min(product.quantity || q + 1, q + 1))}
+              >
+                +
+              </button>
+            </div>
+          </div>
+
+          <div className="mt-4 flex flex-wrap gap-2 text-xs font-medium text-slate-600">
+            <span className="inline-flex items-center gap-1 rounded-full bg-[#F5F8F6] px-3 py-2"><MapPin size={13} />{addressText}</span>
+            <span className="inline-flex items-center gap-1 rounded-full bg-[#F5F8F6] px-3 py-2"><Truck size={13} />{isAvailable ? 'Ready to order' : 'Unavailable'}</span>
+            {harvestDateText ? <span className="inline-flex items-center gap-1 rounded-full bg-[#F5F8F6] px-3 py-2"><CalendarClock size={13} />{harvestDateText}</span> : null}
+          </div>
+
+          <div className="mt-4 rounded-[24px] bg-[#F5FBF6] p-4">
+            <h2 className="text-sm font-bold text-slate-900">Delivery and Pickup</h2>
+            <p className="mt-1 text-sm text-slate-600">Collect directly from the farmer or coordinate delivery once your order is confirmed.</p>
+            <div className="mt-3 flex gap-2">
+              <button type="button" className="rounded-full border border-emerald-200 bg-white px-4 py-2 text-xs font-semibold text-farm-green">Call farmer</button>
+              <button type="button" className="rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-600">Message</button>
+            </div>
+          </div>
+        </section>
+
+        <section className="rounded-[30px] bg-white p-5 shadow-soft">
+          <h2 className="text-base font-bold text-slate-900">Product description</h2>
+          <p className="mt-3 text-sm leading-6 text-slate-600">{product.description || 'Fresh produce from trusted local farmers.'}</p>
+        </section>
+
+        <section className="rounded-[30px] bg-white p-4 shadow-soft">
+          <h2 className="mb-3 text-base font-bold text-slate-900">Pickup location</h2>
+          {hasPickupCoords ? (
+            <MapboxMarkersMap
+              markers={[{ latitude: product.pickupLatitude, longitude: product.pickupLongitude, name: product.name, locationName: addressText }]}
+              height={240}
+            />
+          ) : (
+            <p className="text-sm text-amber-700">GPS coordinates missing.</p>
+          )}
+          <div className="mt-3 flex items-center justify-between text-xs text-slate-600">
+            <span>{addressText}</span>
+            {destinationUrl ? <a href={destinationUrl} target="_blank" rel="noreferrer" className="font-semibold text-farm-green">Get directions</a> : null}
+          </div>
+        </section>
+
+        <section className="rounded-[30px] bg-white p-4 shadow-soft">
+          <div className="mb-3 flex items-center justify-between">
+            <h2 className="text-base font-bold text-slate-900">Reviews</h2>
+            <Link to="/marketplace" className="text-xs font-semibold text-farm-green">Keep shopping</Link>
+          </div>
+          {reviews.length === 0 ? (
+            <p className="text-sm text-slate-500">No reviews yet.</p>
+          ) : (
+            <div className="space-y-3">
+              {reviews.map((review) => (
+                <div key={review.id} className="rounded-[22px] bg-[#F8FAF8] p-3">
+                  <p className="text-sm font-semibold text-slate-900">Rating: {review.rating}/5</p>
+                  <p className="mt-1 text-xs text-slate-600">{review.comment || 'No comment'}</p>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+      </div>
+
+      <div className="fixed bottom-16 left-0 right-0 z-30 px-4 pb-3 lg:bottom-4">
+        <div className="mx-auto flex max-w-screen-sm items-center gap-3 rounded-[26px] bg-white/96 p-3 shadow-[0_18px_40px_rgba(15,23,42,0.14)] backdrop-blur">
+          <div className="min-w-0">
+            <p className="text-xs text-slate-500">Total</p>
+            <p className="text-lg font-black text-slate-900">BWP {(Number(product.price) * quantity).toFixed(2)}</p>
+          </div>
+          <button
+            type="button"
+            onClick={onAdd}
+            disabled={!isAvailable}
+            className="flex-1 rounded-[18px] bg-farm-green px-4 py-3 text-sm font-bold text-white disabled:opacity-50"
+          >
+            {isAvailable ? 'Add To Cart' : 'Unavailable'}
+          </button>
+        </div>
+      </div>
+    </AppLayout>
+  );
 }

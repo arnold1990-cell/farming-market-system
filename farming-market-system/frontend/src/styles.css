@@ -28,8 +28,8 @@ body {
   @apply bg-farm-gray text-farm-charcoal;
   font-family: 'Avenir Next', 'Trebuchet MS', 'Segoe UI', sans-serif;
   background:
-    radial-gradient(circle at top, rgba(107, 161, 93, 0.16), transparent 28rem),
-    linear-gradient(180deg, #f6f8f2 0%, #eef3e9 45%, #f7faf5 100%);
+    radial-gradient(circle at top, rgba(16, 166, 74, 0.12), transparent 28rem),
+    linear-gradient(180deg, #f7faf8 0%, #f2f7f4 42%, #f7faf8 100%);
 }
 
 img {
@@ -47,7 +47,7 @@ main, section, article, div {
 }
 
 .card {
-  @apply rounded-2xl bg-white shadow-soft;
+  @apply rounded-[24px] bg-white shadow-soft;
 }
 
 .badge {
@@ -65,4 +65,11 @@ main, section, article, div {
 
 .section-subtitle {
   @apply text-xs text-slate-500;
+}
+
+input,
+button,
+textarea,
+select {
+  font: inherit;
 }

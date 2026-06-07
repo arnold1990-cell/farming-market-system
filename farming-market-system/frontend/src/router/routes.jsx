@@ -1,27 +1,29 @@
-import LandingPage from '../pages/LandingPage';
-import LoginPage from '../pages/auth/LoginPage';
-import RegisterPage from '../pages/auth/RegisterPage';
-import MarketplacePage from '../pages/MarketplacePage';
-import ProductDetailsPage from '../pages/ProductDetailsPage';
-import CartPage from '../pages/CartPage';
-import CheckoutPage from '../pages/CheckoutPage';
-import OrdersPage from '../pages/OrdersPage';
-import CustomerMapPage from '../pages/CustomerMapPage';
-import HarvestCalendarPage from '../pages/HarvestCalendarPage';
-import BuyerDashboardPage from '../pages/buyer/BuyerDashboardPage';
-import FarmerDashboardPage from '../pages/farmer/FarmerDashboardPage';
-import FarmerProductsPage from '../pages/farmer/FarmerProductsPage';
-import FarmerOrdersPage from '../pages/farmer/FarmerOrdersPage';
-import FarmerProductDetailsPage from '../pages/farmer/FarmerProductDetailsPage';
-import FarmerProfilePage from '../pages/farmer/FarmerProfilePage';
-import FarmerWeatherPage from '../pages/farmer/FarmerWeatherPage';
-import DeliveryDashboardPage from '../pages/delivery/DeliveryDashboardPage';
-import AdminDashboardPage from '../pages/admin/AdminDashboardPage';
-import AdminManagementPage from '../pages/admin/AdminManagementPage';
-import FarmersPage from '../pages/admin/FarmersPage';
-import NotFoundPage from '../pages/NotFoundPage';
+import { lazy } from 'react';
 import ProtectedRoute from '../routes/ProtectedRoute';
 import RoleRoute from '../routes/RoleRoute';
+
+const LandingPage = lazy(() => import('../pages/LandingPage'));
+const LoginPage = lazy(() => import('../pages/auth/LoginPage'));
+const RegisterPage = lazy(() => import('../pages/auth/RegisterPage'));
+const MarketplacePage = lazy(() => import('../pages/MarketplacePage'));
+const ProductDetailsPage = lazy(() => import('../pages/ProductDetailsPage'));
+const CartPage = lazy(() => import('../pages/CartPage'));
+const CheckoutPage = lazy(() => import('../pages/CheckoutPage'));
+const OrdersPage = lazy(() => import('../pages/OrdersPage'));
+const CustomerMapPage = lazy(() => import('../pages/CustomerMapPage'));
+const HarvestCalendarPage = lazy(() => import('../pages/HarvestCalendarPage'));
+const BuyerDashboardPage = lazy(() => import('../pages/buyer/BuyerDashboardPage'));
+const FarmerDashboardPage = lazy(() => import('../pages/farmer/FarmerDashboardPage'));
+const FarmerProductsPage = lazy(() => import('../pages/farmer/FarmerProductsPage'));
+const FarmerOrdersPage = lazy(() => import('../pages/farmer/FarmerOrdersPage'));
+const FarmerProductDetailsPage = lazy(() => import('../pages/farmer/FarmerProductDetailsPage'));
+const FarmerProfilePage = lazy(() => import('../pages/farmer/FarmerProfilePage'));
+const FarmerWeatherPage = lazy(() => import('../pages/farmer/FarmerWeatherPage'));
+const DeliveryDashboardPage = lazy(() => import('../pages/delivery/DeliveryDashboardPage'));
+const AdminDashboardPage = lazy(() => import('../pages/admin/AdminDashboardPage'));
+const AdminManagementPage = lazy(() => import('../pages/admin/AdminManagementPage'));
+const FarmersPage = lazy(() => import('../pages/admin/FarmersPage'));
+const NotFoundPage = lazy(() => import('../pages/NotFoundPage'));
 
 export const routes = [
   { path: '/', element: <LandingPage /> },

@@ -1,6 +1,16 @@
 import MobileAppShell from '../components/MobileAppShell';
 
-export default function AppLayout({ children, showMobileNav = true, title, subtitle, showSearch, searchValue, onSearchChange, onSearchSubmit }) {
+export default function AppLayout({
+  children,
+  showMobileNav = true,
+  title,
+  subtitle,
+  showSearch,
+  searchValue,
+  onSearchChange,
+  onSearchSubmit,
+  hideHeader = false
+}) {
   return (
     <MobileAppShell
       title={title}
@@ -10,6 +20,7 @@ export default function AppLayout({ children, showMobileNav = true, title, subti
       onSearchChange={onSearchChange}
       onSearchSubmit={onSearchSubmit}
       showBottomNav={showMobileNav}
+      hideHeader={hideHeader}
     >
       {children}
     </MobileAppShell>
