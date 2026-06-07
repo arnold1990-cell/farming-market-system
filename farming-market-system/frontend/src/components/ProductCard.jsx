@@ -31,6 +31,7 @@ export default function ProductCard({ product, onAdd }) {
           src={imgSrc}
           onError={() => setImgSrc(FALLBACK_IMAGE)}
           loading="lazy"
+          alt={product.name || 'Product image'}
           className="h-24 w-full rounded-[16px] object-cover"
         />
         {discount > 0 ? (
