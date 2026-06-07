@@ -1,16 +1,29 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { Bell, ChevronRight, Clock3, MapPin, Menu, Search, ShoppingBag } from 'lucide-react';
 import AppLayout from '../../layouts/AppLayout';
-import StatCard from '../../components/StatCard';
-import DataTable from '../../components/DataTable';
+import ProductCard from '../../components/ProductCard';
+import FarmerCard from '../../components/FarmerCard';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import EmptyState from '../../components/EmptyState';
 import OrderCard from '../../components/OrderCard';
-import { Bell, ShoppingBag, Truck } from 'lucide-react';
 import { getMyOrders } from '../../services/orderService';
 import { getApprovedMarketplaceFeed } from '../../services/marketplaceService';
-import { getCart } from '../../services/cartService';
+import { getCart, addToCart } from '../../services/cartService';
 import { getApiErrorMessage } from '../../utils/errorHandler';
+import { toMediaUrl } from '../../utils/media';
+
+const fallbackImage = 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=900&q=80';
+const promoImage = 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=800&q=80';
+
+const categoryCards = [
+  { name: 'Fresh Fruits', image: 'https://images.unsplash.com/photo-1619566636858-adf3ef46400b?auto=format&fit=crop&w=300&q=80' },
+  { name: 'Vegetables', image: 'https://images.unsplash.com/photo-1518843875459-f738682238a6?auto=format&fit=crop&w=300&q=80' },
+  { name: 'Beverages', image: 'https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=300&q=80' },
+  { name: 'Grocery & Staples', image: 'https://images.unsplash.com/photo-1573246123716-6b1782bfc499?auto=format&fit=crop&w=300&q=80' },
+  { name: 'Bakery & Snacks', image: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=300&q=80' },
+  { name: 'Dairy & Eggs', image: 'https://images.unsplash.com/photo-1563636619-e9143da7973b?auto=format&fit=crop&w=300&q=80' }
+];
 
 export default function BuyerDashboardPage() {
   const [orders, setOrders] = useState([]);
@@ -18,6 +31,8 @@ export default function BuyerDashboardPage() {
   const [cartCount, setCartCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [search, setSearch] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('ALL');
 
   useEffect(() => {
     const load = async () => {
@@ -26,8 +41,8 @@ export default function BuyerDashboardPage() {
       try {
         const [myOrders, allProducts, cart] = await Promise.all([getMyOrders(), getApprovedMarketplaceFeed(), getCart()]);
         setOrders(myOrders || []);
-        setProducts((allProducts || []).slice(0, 6));
-        setCartCount((cart?.items || []).length);
+        setProducts(allProducts || []);
+        setCartCount((cart?.items || []).reduce((sum, item) => sum + Number(item.quantity || 0), 0));
       } catch (e) {
         setError(getApiErrorMessage(e, 'Failed to load dashboard'));
       } finally {
@@ -37,8 +52,206 @@ export default function BuyerDashboardPage() {
     load();
   }, []);
 
+  const filteredProducts = useMemo(() => {
+    const byCategory = selectedCategory === 'ALL' ? products : products.filter((p) => p.categoryName === selectedCategory);
+    if (!search) return byCategory;
+    return byCategory.filter((p) =>
+      `${p.name || ''} ${p.farmerName || ''} ${p.categoryName || ''} ${p.locationName || ''}`
+        .toLowerCase()
+        .includes(search.toLowerCase())
+    );
+  }, [products, search, selectedCategory]);
+
+  const popularProducts = useMemo(() => filteredProducts.slice(0, 4), [filteredProducts]);
+  const dailyProducts = useMemo(() => filteredProducts.slice(4, 8), [filteredProducts]);
+  const nearbyFarmers = useMemo(() => {
+    const grouped = filteredProducts.reduce((acc, product) => {
+      const name = product.farmerName || 'Farmer';
+      if (!acc[name]) {
+        acc[name] = { name, products: 0, location: product.pickupAddress || product.locationName || 'Unknown' };
+      }
+      acc[name].products += 1;
+      return acc;
+    }, {});
+    return Object.values(grouped).slice(0, 3);
+  }, [filteredProducts]);
+
+  const onAdd = async (product) => {
+    try {
+      await addToCart(product, 1);
+      setCartCount((count) => count + 1);
+    } catch (_) {
+    }
+  };
+
+  const mapProduct = (product, oldPrice = null) => ({
+    ...product,
+    stock: product.quantity,
+    farmer: product.farmerName || 'Farmer',
+    image: product.imageUrl ? toMediaUrl(product.imageUrl) : fallbackImage,
+    location: product.pickupAddress || product.locationName || 'Unknown',
+    availabilityStatus: product.availabilityStatus || 'AVAILABLE',
+    oldPrice
+  });
+
   if (loading) return <AppLayout title="Buyer Dashboard"><LoadingSpinner /></AppLayout>;
   if (error) return <AppLayout title="Buyer Dashboard"><EmptyState title="Error" subtitle={error} /></AppLayout>;
 
-  return <AppLayout title="Buyer Dashboard" subtitle="Track orders and browse produce"><div className="space-y-4"><section className="rounded-[30px] bg-white/90 p-4 shadow-soft"><h1 className="text-xl font-black text-slate-900">Welcome back</h1><p className="mt-1 text-sm text-slate-500">Your customer portal keeps marketplace browsing, harvest planning, and orders in one mobile view.</p><div className="mt-4 grid grid-cols-3 gap-2"><div className="rounded-2xl bg-emerald-50 px-2 py-2 text-center"><p className="text-[11px] text-emerald-700">Orders</p><p className="text-lg font-bold text-emerald-800">{orders.length}</p></div><div className="rounded-2xl bg-lime-50 px-2 py-2 text-center"><p className="text-[11px] text-lime-700">Cart</p><p className="text-lg font-bold text-lime-800">{cartCount}</p></div><div className="rounded-2xl bg-sky-50 px-2 py-2 text-center"><p className="text-[11px] text-sky-700">Fresh picks</p><p className="text-lg font-bold text-sky-800">{products.length}</p></div></div><div className="mt-4 grid grid-cols-2 gap-2"><Link to="/marketplace" className="rounded-2xl bg-farm-green px-3 py-3 text-center text-sm font-semibold text-white">Browse Market</Link><Link to="/map" className="rounded-2xl border border-emerald-100 bg-emerald-50 px-3 py-3 text-center text-sm font-semibold text-farm-green">Nearby Farmers</Link></div></section><div className="grid grid-cols-2 gap-3"><StatCard label="Recent Orders" value={orders.length} icon={ShoppingBag} /><StatCard label="Cart Items" value={cartCount} icon={Truck} /><StatCard label="Notifications" value={0} icon={Bell} /></div><div className="space-y-3"><h3 className="text-sm font-semibold">Recent Orders</h3><DataTable columns={[{ key: 'id', title: 'Order' }, { key: 'status', title: 'Status' }, { key: 'totalAmount', title: 'Total' }]} rows={orders.map((o) => ({ ...o, id: `#${o.id}` }))} mobileRender={(r) => <OrderCard order={r} />} /></div><div className="rounded-[28px] bg-white/90 p-4 shadow-soft"><h3 className="mb-2 text-sm font-semibold">Recommended Products</h3><div className="space-y-2">{products.map((p) => <div key={p.id} className="flex items-center justify-between text-sm"><span className="line-clamp-1">{p.name}</span><span className="font-semibold text-farm-green">BWP {Number(p.price).toFixed(2)}</span></div>)}</div></div></div></AppLayout>;
+  return (
+    <AppLayout title="Buyer Dashboard" hideHeader>
+      <div className="space-y-4 pb-4">
+        <section className="-mx-4 rounded-b-[32px] bg-gradient-to-b from-[#0FA24A] to-[#0B8F40] px-4 pb-5 pt-4 text-white shadow-[0_18px_44px_rgba(8,160,69,0.28)] sm:-mx-5 sm:px-5">
+          <div className="mx-auto max-w-screen-sm space-y-3">
+            <div className="flex items-center justify-between">
+              <button type="button" className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white/15 backdrop-blur">
+                <Menu size={18} />
+              </button>
+              <div className="text-center">
+                <p className="text-[11px] text-emerald-100">Your location</p>
+                <p className="text-sm font-semibold">Gaborone</p>
+              </div>
+              <button type="button" className="relative flex h-10 w-10 items-center justify-center rounded-2xl bg-white/15 backdrop-blur">
+                <Bell size={18} />
+                <span className="absolute right-2 top-2 h-2.5 w-2.5 rounded-full bg-yellow-300" />
+              </button>
+            </div>
+
+            <div>
+              <p className="text-[12px] font-semibold tracking-[0.24em] text-emerald-100">PULA HARVEST</p>
+              <h1 className="mt-1 text-[1.5rem] font-black leading-tight">Fresh groceries delivered fast</h1>
+            </div>
+
+            <label className="flex items-center gap-3 rounded-[24px] bg-white px-4 py-3 text-slate-900 shadow-lg">
+              <Search size={17} className="text-slate-400" />
+              <input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="What are you looking for today?"
+                className="w-full bg-transparent text-sm outline-none placeholder:text-slate-400"
+              />
+            </label>
+
+            <div className="grid grid-cols-[1fr_118px] gap-3 rounded-[26px] bg-white p-3 text-slate-900 shadow-[0_18px_28px_rgba(0,0,0,0.12)]">
+              <div className="space-y-2">
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-emerald-600">Get Discount</p>
+                <p className="text-3xl font-black leading-none text-[#067A38]">25%</p>
+                <p className="text-sm text-slate-600">On Vegetables & Fruits</p>
+                <Link to="/marketplace" className="inline-flex items-center gap-1 rounded-full bg-farm-green px-4 py-2 text-xs font-bold text-white">
+                  Shop Now
+                  <ChevronRight size={14} />
+                </Link>
+              </div>
+              <div className="overflow-hidden rounded-[22px] bg-[#EAF7ED]">
+                <img src={promoImage} className="h-full w-full object-cover" alt="Fresh produce" />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="space-y-3">
+          <div className="flex items-center justify-between">
+            <h2 className="text-base font-bold text-slate-900">Categories</h2>
+            <Link to="/marketplace" className="text-xs font-semibold text-farm-green">See all</Link>
+          </div>
+          <div className="-mx-1 flex gap-3 overflow-x-auto px-1 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <button
+              type="button"
+              onClick={() => setSelectedCategory('ALL')}
+              className={`min-w-[92px] rounded-[24px] border p-2 text-left shadow-soft ${selectedCategory === 'ALL' ? 'border-emerald-200 bg-white' : 'border-transparent bg-white/85'}`}
+            >
+              <div className="mb-2 h-16 rounded-[18px] bg-gradient-to-br from-emerald-100 to-lime-100" />
+              <p className="text-xs font-semibold text-slate-800">All</p>
+            </button>
+            {categoryCards.map((category) => (
+              <button
+                key={category.name}
+                type="button"
+                onClick={() => setSelectedCategory(category.name)}
+                className={`min-w-[92px] rounded-[24px] border p-2 text-left shadow-soft ${
+                  selectedCategory === category.name ? 'border-emerald-200 bg-white' : 'border-transparent bg-white/85'
+                }`}
+              >
+                <img src={category.image} alt={category.name} className="mb-2 h-16 w-full rounded-[18px] object-cover" />
+                <p className="line-clamp-2 text-xs font-semibold text-slate-800">{category.name}</p>
+              </button>
+            ))}
+          </div>
+        </section>
+
+        <section className="space-y-3">
+          <div className="flex items-center justify-between">
+            <h2 className="text-base font-bold text-slate-900">Most Popular Picks</h2>
+            <span className="rounded-full bg-white px-3 py-1 text-[11px] font-semibold text-slate-500 shadow-soft">{cartCount} in cart</span>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            {popularProducts.map((product) => (
+              <ProductCard key={product.id} product={mapProduct(product)} onAdd={() => onAdd(product)} />
+            ))}
+          </div>
+        </section>
+
+        <section className="space-y-3">
+          <div className="flex items-center justify-between">
+            <h2 className="text-base font-bold text-slate-900">Nearby Farmers</h2>
+            <Link to="/map" className="text-xs font-semibold text-farm-green">Open map</Link>
+          </div>
+          <div className="space-y-3">
+            {nearbyFarmers.map((farmer) => (
+              <FarmerCard key={`${farmer.name}-${farmer.location}`} farmer={farmer} />
+            ))}
+          </div>
+        </section>
+
+        <section className="space-y-3">
+          <div className="flex items-center justify-between">
+            <h2 className="text-base font-bold text-slate-900">Fresh Finds of the Day</h2>
+            <Link to="/marketplace" className="text-xs font-semibold text-farm-green">View all</Link>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            {dailyProducts.map((product) => (
+              <ProductCard key={`daily-${product.id}`} product={mapProduct(product, Number(product.price) * 1.18)} onAdd={() => onAdd(product)} />
+            ))}
+          </div>
+        </section>
+
+        <section className="rounded-[28px] bg-white p-4 shadow-soft">
+          <div className="mb-3 flex items-center justify-between">
+            <div>
+              <h2 className="text-sm font-bold text-slate-900">Your Orders</h2>
+              <p className="text-xs text-slate-500">Track recent purchases and delivery progress.</p>
+            </div>
+            <Link to="/orders" className="text-xs font-semibold text-farm-green">See all</Link>
+          </div>
+          {orders.length ? (
+            <div className="space-y-3">
+              {orders.slice(0, 2).map((order) => (
+                <OrderCard key={order.id} order={{ ...order, id: `#${order.id}` }} />
+              ))}
+            </div>
+          ) : (
+            <div className="rounded-[22px] bg-[#F7FAF8] p-4 text-sm text-slate-500">
+              No orders yet. Start with the market and build your basket.
+            </div>
+          )}
+          <div className="mt-3 grid grid-cols-3 gap-2">
+            <div className="rounded-[18px] bg-[#F7FAF8] p-3 text-center">
+              <ShoppingBag size={16} className="mx-auto text-farm-green" />
+              <p className="mt-2 text-[11px] text-slate-500">Orders</p>
+              <p className="text-sm font-bold text-slate-900">{orders.length}</p>
+            </div>
+            <div className="rounded-[18px] bg-[#F7FAF8] p-3 text-center">
+              <Clock3 size={16} className="mx-auto text-farm-green" />
+              <p className="mt-2 text-[11px] text-slate-500">Pending</p>
+              <p className="text-sm font-bold text-slate-900">{orders.filter((order) => order.status !== 'DELIVERED').length}</p>
+            </div>
+            <div className="rounded-[18px] bg-[#F7FAF8] p-3 text-center">
+              <MapPin size={16} className="mx-auto text-farm-green" />
+              <p className="mt-2 text-[11px] text-slate-500">Pickup</p>
+              <p className="text-sm font-bold text-slate-900">{nearbyFarmers.length}</p>
+            </div>
+          </div>
+        </section>
+      </div>
+    </AppLayout>
+  );
 }

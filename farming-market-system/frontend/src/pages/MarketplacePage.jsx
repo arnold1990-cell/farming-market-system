@@ -1,9 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { MapPinned } from 'lucide-react';
+import { Bell, ChevronRight, MapPinned, Menu, Search } from 'lucide-react';
 import AppLayout from '../layouts/AppLayout';
 import ProductCard from '../components/ProductCard';
-import CategoryChip from '../components/CategoryChip';
 import EmptyState from '../components/EmptyState';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ToastStack from '../components/ToastStack';
@@ -14,15 +13,25 @@ import { getApiErrorMessage } from '../utils/errorHandler';
 import { toMediaUrl } from '../utils/media';
 
 const fallbackImage = 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=900&q=80';
+const promoImage = 'https://images.unsplash.com/photo-1518843875459-f738682238a6?auto=format&fit=crop&w=800&q=80';
+
+const categoryImageMap = {
+  'Fresh Fruits': 'https://images.unsplash.com/photo-1619566636858-adf3ef46400b?auto=format&fit=crop&w=300&q=80',
+  Vegetables: 'https://images.unsplash.com/photo-1518843875459-f738682238a6?auto=format&fit=crop&w=300&q=80',
+  Beverages: 'https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=300&q=80',
+  'Grocery & Staples': 'https://images.unsplash.com/photo-1573246123716-6b1782bfc499?auto=format&fit=crop&w=300&q=80',
+  'Bakery & Snacks': 'https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=300&q=80',
+  'Dairy & Eggs': 'https://images.unsplash.com/photo-1563636619-e9143da7973b?auto=format&fit=crop&w=300&q=80'
+};
 
 export default function MarketplacePage() {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
-  const [q, setQ] = useState('');
+  const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [toasts, setToasts] = useState([]);
-  const [filters, setFilters] = useState({ categoryId: 'ALL', location: '', currency: 'BWP', availability: 'ALL', minPrice: '', maxPrice: '' });
+  const [filters, setFilters] = useState({ categoryId: 'ALL', location: '', availability: 'ALL' });
 
   const pushToast = (type, message) => {
     const id = Date.now() + Math.random();
@@ -35,41 +44,52 @@ export default function MarketplacePage() {
     setError('');
     try {
       const params = {
-        keyword: q || undefined,
+        keyword: query || undefined,
         categoryId: filters.categoryId !== 'ALL' ? Number(filters.categoryId) : undefined,
-        location: filters.location || undefined,
-        currency: filters.currency !== 'ALL' ? filters.currency : undefined,
-        minPrice: filters.minPrice !== '' ? Number(filters.minPrice) : undefined,
-        maxPrice: filters.maxPrice !== '' ? Number(filters.maxPrice) : undefined
+        location: filters.location || undefined
       };
-      const [ps, cs] = await Promise.all([getApprovedMarketplaceFeed(params), getCategories()]);
-      const publicProducts = ps || [];
-      setProducts(publicProducts.filter((p) => {
-        if (filters.availability === 'ALL') return true;
-        if (filters.availability === 'IN_FIELD') return (p.harvestStatus || '') === 'IN_FIELD';
-        return (p.availabilityStatus || 'AVAILABLE') === filters.availability;
-      }));
-      setCategories(cs || []);
+      const [productResponse, categoryResponse] = await Promise.all([getApprovedMarketplaceFeed(params), getCategories()]);
+      const publicProducts = productResponse || [];
+      setProducts(
+        publicProducts.filter((product) => {
+          if (filters.availability === 'ALL') return true;
+          if (filters.availability === 'IN_FIELD') return (product.harvestStatus || '') === 'IN_FIELD';
+          return (product.availabilityStatus || 'AVAILABLE') === filters.availability;
+        })
+      );
+      setCategories(categoryResponse || []);
     } catch (err) {
-      const friendly = getApiErrorMessage(err, 'Could not load products. Please try again.');
-      setError(friendly || 'Could not load products. Please try again.');
+      setError(getApiErrorMessage(err, 'Could not load products. Please try again.'));
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => { load(); }, [q, filters.categoryId, filters.location, filters.currency, filters.minPrice, filters.maxPrice, filters.availability]);
+  useEffect(() => {
+    load();
+  }, [query, filters.categoryId, filters.location, filters.availability]);
 
-  const filtered = useMemo(() => products, [products]);
-  const readinessCount = useMemo(() => ({
-    all: filtered.length,
-    ready: filtered.filter((p) => (p.availabilityStatus || 'AVAILABLE') === 'AVAILABLE').length,
-    maturing: filtered.filter((p) => (p.harvestStatus || '') === 'IN_FIELD').length
-  }), [filtered]);
+  const categoryCards = useMemo(
+    () =>
+      categories.map((category) => ({
+        ...category,
+        image: categoryImageMap[category.name] || fallbackImage
+      })),
+    [categories]
+  );
 
-  const onAdd = async (p) => {
+  const counts = useMemo(
+    () => ({
+      all: products.length,
+      ready: products.filter((p) => (p.availabilityStatus || 'AVAILABLE') === 'AVAILABLE').length,
+      maturing: products.filter((p) => (p.harvestStatus || '') === 'IN_FIELD').length
+    }),
+    [products]
+  );
+
+  const onAdd = async (product) => {
     try {
-      await addToCart(p, 1);
+      await addToCart(product, 1);
       pushToast('success', 'Added to cart');
     } catch (err) {
       pushToast('error', getApiErrorMessage(err, 'Could not add to cart'));
@@ -77,44 +97,158 @@ export default function MarketplacePage() {
   };
 
   const onResetFilters = () => {
-    setFilters({ categoryId: 'ALL', location: '', currency: 'ALL', availability: 'ALL', minPrice: '', maxPrice: '' });
-    setQ('');
+    setFilters({ categoryId: 'ALL', location: '', availability: 'ALL' });
+    setQuery('');
   };
 
-  return <AppLayout title="Market" subtitle="Browse fresh listings near you" showSearch searchValue={q} onSearchChange={(e) => setQ(e.target.value)}><ToastStack toasts={toasts} onClose={(id) => setToasts((prev) => prev.filter((t) => t.id !== id))} /><div className="space-y-4">
-    <section className="rounded-[30px] bg-white/90 p-4 shadow-soft">
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <h1 className="text-xl font-black text-slate-900">Marketplace feed</h1>
-          <p className="mt-1 text-sm text-slate-500">Track harvest readiness, compare BWP pricing, and locate farmers before ordering.</p>
-        </div>
-        <Link to="/map" className="inline-flex items-center gap-1 rounded-2xl bg-farm-mint px-3 py-2 text-xs font-semibold text-farm-green"><MapPinned size={14} />Open map</Link>
+  return (
+    <AppLayout title="Market" hideHeader>
+      <ToastStack toasts={toasts} onClose={(id) => setToasts((prev) => prev.filter((t) => t.id !== id))} />
+      <div className="space-y-4 pb-4">
+        <section className="-mx-4 rounded-b-[32px] bg-gradient-to-b from-[#10A64A] to-[#0A8E3E] px-4 pb-5 pt-4 text-white shadow-[0_18px_44px_rgba(8,160,69,0.28)] sm:-mx-5 sm:px-5">
+          <div className="mx-auto max-w-screen-sm space-y-3">
+            <div className="flex items-center justify-between">
+              <button type="button" className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white/15 backdrop-blur">
+                <Menu size={18} />
+              </button>
+              <div className="text-center">
+                <p className="text-[11px] text-emerald-100">Your location</p>
+                <p className="text-sm font-semibold">Gaborone</p>
+              </div>
+              <button type="button" className="relative flex h-10 w-10 items-center justify-center rounded-2xl bg-white/15 backdrop-blur">
+                <Bell size={18} />
+                <span className="absolute right-2 top-2 h-2.5 w-2.5 rounded-full bg-yellow-300" />
+              </button>
+            </div>
+
+            <div>
+              <p className="text-[12px] font-semibold tracking-[0.24em] text-emerald-100">MARKET</p>
+              <h1 className="mt-1 text-[1.5rem] font-black leading-tight">Fresh groceries delivered fast</h1>
+            </div>
+
+            <label className="flex items-center gap-3 rounded-[24px] bg-white px-4 py-3 text-slate-900 shadow-lg">
+              <Search size={17} className="text-slate-400" />
+              <input
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Search fruits, vegetables, farmers"
+                className="w-full bg-transparent text-sm outline-none placeholder:text-slate-400"
+              />
+            </label>
+
+            <div className="grid grid-cols-[1fr_118px] gap-3 rounded-[26px] bg-white p-3 text-slate-900 shadow-[0_18px_28px_rgba(0,0,0,0.12)]">
+              <div className="space-y-2">
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-emerald-600">Get Discount</p>
+                <p className="text-3xl font-black leading-none text-[#067A38]">25%</p>
+                <p className="text-sm text-slate-600">On Vegetables & Fruits</p>
+                <Link to="/cart" className="inline-flex items-center gap-1 rounded-full bg-farm-green px-4 py-2 text-xs font-bold text-white">
+                  Shop Now
+                  <ChevronRight size={14} />
+                </Link>
+              </div>
+              <div className="overflow-hidden rounded-[22px] bg-[#EAF7ED]">
+                <img src={promoImage} alt="Vegetables" className="h-full w-full object-cover" />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="space-y-3">
+          <div className="flex items-center justify-between">
+            <h2 className="text-base font-bold text-slate-900">Browse Categories</h2>
+            <Link to="/map" className="inline-flex items-center gap-1 text-xs font-semibold text-farm-green">
+              <MapPinned size={13} />
+              Open map
+            </Link>
+          </div>
+          <div className="-mx-1 flex gap-3 overflow-x-auto px-1 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <button
+              type="button"
+              onClick={() => setFilters((f) => ({ ...f, categoryId: 'ALL' }))}
+              className={`min-w-[98px] rounded-[24px] border p-2 text-left shadow-soft ${filters.categoryId === 'ALL' ? 'border-emerald-200 bg-white' : 'border-transparent bg-white/85'}`}
+            >
+              <div className="mb-2 h-16 rounded-[18px] bg-gradient-to-br from-emerald-100 to-lime-100" />
+              <p className="text-xs font-semibold text-slate-800">All</p>
+            </button>
+            {categoryCards.map((category) => (
+              <button
+                key={category.id}
+                type="button"
+                onClick={() => setFilters((f) => ({ ...f, categoryId: String(category.id) }))}
+                className={`min-w-[98px] rounded-[24px] border p-2 text-left shadow-soft ${
+                  String(filters.categoryId) === String(category.id) ? 'border-emerald-200 bg-white' : 'border-transparent bg-white/85'
+                }`}
+              >
+                <img src={category.image} alt={category.name} className="mb-2 h-16 w-full rounded-[18px] object-cover" />
+                <p className="line-clamp-2 text-xs font-semibold text-slate-800">{category.name}</p>
+              </button>
+            ))}
+          </div>
+        </section>
+
+        <section className="grid grid-cols-3 gap-2">
+          <div className="rounded-[22px] bg-white p-3 text-center shadow-soft">
+            <p className="text-[11px] text-slate-500">All</p>
+            <p className="text-lg font-black text-slate-900">{counts.all}</p>
+          </div>
+          <div className="rounded-[22px] bg-white p-3 text-center shadow-soft">
+            <p className="text-[11px] text-slate-500">Ready now</p>
+            <p className="text-lg font-black text-farm-green">{counts.ready}</p>
+          </div>
+          <div className="rounded-[22px] bg-white p-3 text-center shadow-soft">
+            <p className="text-[11px] text-slate-500">Maturing</p>
+            <p className="text-lg font-black text-amber-600">{counts.maturing}</p>
+          </div>
+        </section>
+
+        <section className="rounded-[28px] bg-white p-4 shadow-soft">
+          <div className="flex flex-wrap gap-2">
+            <button className={`rounded-full px-3 py-2 text-xs font-semibold ${filters.availability === 'ALL' ? 'bg-farm-green text-white' : 'bg-slate-100 text-slate-600'}`} onClick={() => setFilters((f) => ({ ...f, availability: 'ALL' }))}>All produce</button>
+            <button className={`rounded-full px-3 py-2 text-xs font-semibold ${filters.availability === 'AVAILABLE' ? 'bg-farm-green text-white' : 'bg-slate-100 text-slate-600'}`} onClick={() => setFilters((f) => ({ ...f, availability: 'AVAILABLE' }))}>Ready now</button>
+            <button className={`rounded-full px-3 py-2 text-xs font-semibold ${filters.availability === 'IN_FIELD' ? 'bg-farm-green text-white' : 'bg-slate-100 text-slate-600'}`} onClick={() => setFilters((f) => ({ ...f, availability: 'IN_FIELD' }))}>Maturing soon</button>
+          </div>
+          <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
+            <input className="rounded-[20px] border border-emerald-100 bg-[#F8FAF8] px-3 py-3 text-sm outline-none" placeholder="Filter by town" value={filters.location} onChange={(e) => setFilters((f) => ({ ...f, location: e.target.value }))} />
+            <button className="rounded-[20px] border border-slate-200 bg-white px-3 py-3 text-sm font-semibold text-slate-600" onClick={onResetFilters}>Reset filters</button>
+          </div>
+        </section>
+
+        {loading ? (
+          <LoadingSpinner />
+        ) : error ? (
+          <div className="space-y-3">
+            <EmptyState title="Could not load products" subtitle={error} />
+            <div className="flex justify-center">
+              <button type="button" className="rounded-xl border px-4 py-2 text-sm font-semibold" onClick={load}>Refresh</button>
+            </div>
+          </div>
+        ) : products.length === 0 ? (
+          <EmptyState title="No products" subtitle="No products found." />
+        ) : (
+          <section className="space-y-3">
+            <div className="flex items-center justify-between">
+              <h2 className="text-base font-bold text-slate-900">Most Popular Picks</h2>
+              <span className="text-xs font-semibold text-slate-400">Live marketplace</span>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              {products.map((product) => (
+                <ProductCard
+                  key={product.id}
+                  product={{
+                    ...product,
+                    stock: product.quantity,
+                    farmer: product.farmerName || 'Farmer',
+                    image: product.imageUrl ? toMediaUrl(product.imageUrl) : fallbackImage,
+                    location: product.pickupAddress || product.locationName || 'Unknown',
+                    availabilityStatus: product.availabilityStatus || 'AVAILABLE'
+                  }}
+                  onAdd={() => onAdd(product)}
+                />
+              ))}
+            </div>
+          </section>
+        )}
       </div>
-      <div className="mt-4 grid grid-cols-3 gap-2 text-center">
-        <div className="rounded-2xl bg-emerald-50 px-2 py-2"><p className="text-[11px] text-emerald-700">Listings</p><p className="text-lg font-bold text-emerald-800">{readinessCount.all}</p></div>
-        <div className="rounded-2xl bg-lime-50 px-2 py-2"><p className="text-[11px] text-lime-700">Ready now</p><p className="text-lg font-bold text-lime-800">{readinessCount.ready}</p></div>
-        <div className="rounded-2xl bg-amber-50 px-2 py-2"><p className="text-[11px] text-amber-700">Maturing</p><p className="text-lg font-bold text-amber-800">{readinessCount.maturing}</p></div>
-      </div>
-    </section>
-    <div className="rounded-[28px] bg-white/90 p-4 shadow-soft">
-      <div className="flex flex-wrap gap-2">
-        <button className={`rounded-full px-3 py-2 text-xs font-semibold ${filters.availability === 'ALL' ? 'bg-farm-green text-white' : 'bg-slate-100 text-slate-600'}`} onClick={() => setFilters((f) => ({ ...f, availability: 'ALL' }))}>All produce</button>
-        <button className={`rounded-full px-3 py-2 text-xs font-semibold ${filters.availability === 'AVAILABLE' ? 'bg-farm-green text-white' : 'bg-slate-100 text-slate-600'}`} onClick={() => setFilters((f) => ({ ...f, availability: 'AVAILABLE' }))}>Ready now</button>
-        <button className={`rounded-full px-3 py-2 text-xs font-semibold ${filters.availability === 'IN_FIELD' ? 'bg-farm-green text-white' : 'bg-slate-100 text-slate-600'}`} onClick={() => setFilters((f) => ({ ...f, availability: 'IN_FIELD' }))}>Maturing soon</button>
-      </div>
-      <div className="mt-3 flex flex-wrap gap-2">
-        <CategoryChip label="All" active={filters.categoryId === 'ALL'} onClick={() => setFilters((f) => ({ ...f, categoryId: 'ALL' }))} />
-        {categories.map((c) => <CategoryChip key={c.id} label={c.name} active={String(filters.categoryId) === String(c.id)} onClick={() => setFilters((f) => ({ ...f, categoryId: String(c.id) }))} />)}
-      </div>
-      <div className="mt-4 grid grid-cols-2 gap-2">
-        <input className="rounded-2xl border border-emerald-100 px-3 py-2.5 text-sm" placeholder="Filter by town" value={filters.location} onChange={(e) => setFilters((f) => ({ ...f, location: e.target.value }))} />
-        <div className="flex gap-2">
-          <input className="w-full rounded-2xl border border-emerald-100 px-3 py-2.5 text-sm" type="number" placeholder="Min BWP" value={filters.minPrice} onChange={(e) => setFilters((f) => ({ ...f, minPrice: e.target.value }))} />
-          <input className="w-full rounded-2xl border border-emerald-100 px-3 py-2.5 text-sm" type="number" placeholder="Max BWP" value={filters.maxPrice} onChange={(e) => setFilters((f) => ({ ...f, maxPrice: e.target.value }))} />
-        </div>
-      </div>
-      <button className="mt-3 rounded-full border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-600" onClick={onResetFilters}>Reset filters</button>
-    </div>
-    {loading ? <LoadingSpinner /> : error ? <div className="space-y-3"><EmptyState title="Could not load products" subtitle="Could not load products. Please try again." /><div className="flex justify-center"><button type="button" className="rounded-xl border px-4 py-2 text-sm font-semibold" onClick={load}>Refresh</button></div></div> : filtered.length === 0 ? <EmptyState title="No products" subtitle="No products found." /> : <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">{filtered.map((p) => <ProductCard key={p.id} product={{ ...p, stock: p.quantity, farmer: p.farmerName || 'Farmer', image: p.imageUrl ? toMediaUrl(p.imageUrl) : fallbackImage, location: p.pickupAddress || p.locationName || 'Unknown', availabilityStatus: p.availabilityStatus || 'AVAILABLE' }} onAdd={() => onAdd(p)} />)}</div>}
-  </div></AppLayout>;
+    </AppLayout>
+  );
 }

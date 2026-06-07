@@ -28,8 +28,8 @@ body {
   @apply bg-farm-gray text-farm-charcoal;
   font-family: 'Avenir Next', 'Trebuchet MS', 'Segoe UI', sans-serif;
   background:
-    radial-gradient(circle at top, rgba(16, 166, 74, 0.12), transparent 28rem),
-    linear-gradient(180deg, #f7faf8 0%, #f2f7f4 42%, #f7faf8 100%);
+    radial-gradient(circle at top, rgba(16, 166, 74, 0.1), transparent 24rem),
+    linear-gradient(180deg, #f7faf8 0%, #f4f8f5 38%, #f7faf8 100%);
 }
 
 img {
@@ -48,6 +48,11 @@ main, section, article, div {
 
 .card {
   @apply rounded-[24px] bg-white shadow-soft;
+}
+
+a,
+button {
+  -webkit-tap-highlight-color: transparent;
 }
 
 .badge {
