@@ -13,18 +13,9 @@ import { getApprovedMarketplaceFeed } from '../../services/marketplaceService';
 import { getCart, addToCart } from '../../services/cartService';
 import { getApiErrorMessage } from '../../utils/errorHandler';
 import { toMediaUrl } from '../../utils/media';
+import { CATEGORY_ORDER, CATEGORY_VISUALS } from '../../data/categoryCatalog';
 
-const fallbackImage = 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=900&q=80';
 const promoImage = 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=800&q=80';
-
-const categoryCards = [
-  { name: 'Fresh Fruits', image: 'https://images.unsplash.com/photo-1619566636858-adf3ef46400b?auto=format&fit=crop&w=300&q=80' },
-  { name: 'Vegetables', image: 'https://images.unsplash.com/photo-1518843875459-f738682238a6?auto=format&fit=crop&w=300&q=80' },
-  { name: 'Beverages', image: 'https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=300&q=80' },
-  { name: 'Grocery & Staples', image: 'https://images.unsplash.com/photo-1573246123716-6b1782bfc499?auto=format&fit=crop&w=300&q=80' },
-  { name: 'Bakery & Snacks', image: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=300&q=80' },
-  { name: 'Dairy & Eggs', image: 'https://images.unsplash.com/photo-1563636619-e9143da7973b?auto=format&fit=crop&w=300&q=80' }
-];
 
 export default function BuyerDashboardPage() {
   const [orders, setOrders] = useState([]);
@@ -65,6 +56,7 @@ export default function BuyerDashboardPage() {
 
   const popularProducts = useMemo(() => filteredProducts.slice(0, 4), [filteredProducts]);
   const dailyProducts = useMemo(() => filteredProducts.slice(4, 8), [filteredProducts]);
+  const categoryCards = useMemo(() => CATEGORY_ORDER.map((name) => ({ name, image: CATEGORY_VISUALS[name]?.image || '' })), []);
   const nearbyFarmers = useMemo(() => {
     const grouped = filteredProducts.reduce((acc, product) => {
       const name = product.farmerName || 'Farmer';
@@ -89,7 +81,7 @@ export default function BuyerDashboardPage() {
     ...product,
     stock: product.quantity,
     farmer: product.farmerName || 'Farmer',
-    image: product.imageUrl ? toMediaUrl(product.imageUrl) : fallbackImage,
+    image: product.imageUrl ? toMediaUrl(product.imageUrl) : '',
     location: product.pickupAddress || product.locationName || 'Unknown',
     availabilityStatus: product.availabilityStatus || 'AVAILABLE',
     oldPrice

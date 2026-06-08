@@ -2,10 +2,8 @@ import { Heart, MapPin, ShoppingCart, Star } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
 
-const FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=900&q=80';
-
 export default function ProductCard({ product, onAdd }) {
-  const [imgSrc, setImgSrc] = useState(product.image || FALLBACK_IMAGE);
+  const [imgSrc, setImgSrc] = useState(product.image || '');
   const status = product.availabilityStatus || 'AVAILABLE';
   const disabled = status !== 'AVAILABLE';
   const stockLevel = Number(product.stock || 0);
@@ -27,13 +25,19 @@ export default function ProductCard({ product, onAdd }) {
   return (
     <article className="group overflow-hidden rounded-[26px] border border-[#EEF3EF] bg-white p-2.5 shadow-[0_16px_36px_rgba(15,23,42,0.08)] transition duration-200 active:scale-[0.99]">
       <div className="relative rounded-[20px] bg-[#F0F7F1] p-2">
-        <img
-          src={imgSrc}
-          onError={() => setImgSrc(FALLBACK_IMAGE)}
-          loading="lazy"
-          alt={product.name || 'Product image'}
-          className="h-24 w-full rounded-[16px] object-cover"
-        />
+        {imgSrc ? (
+          <img
+            src={imgSrc}
+            onError={() => setImgSrc('')}
+            loading="lazy"
+            alt={product.name || 'Product image'}
+            className="h-24 w-full rounded-[16px] object-cover"
+          />
+        ) : (
+          <div className="grid h-24 w-full place-items-center rounded-[16px] bg-gradient-to-br from-emerald-100 to-lime-50 text-center text-[11px] font-semibold text-emerald-800">
+            No product image
+          </div>
+        )}
         {discount > 0 ? (
           <span className="absolute left-3 top-3 rounded-full bg-red-500 px-2 py-1 text-[10px] font-semibold text-white">
             -{discount}%

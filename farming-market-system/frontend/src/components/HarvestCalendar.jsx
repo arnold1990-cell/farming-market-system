@@ -1,89 +1,113 @@
 import { useMemo, useState } from 'react';
-import { Bell, CalendarDays, ChevronLeft, ChevronRight, Leaf, MapPin, Sprout } from 'lucide-react';
+import { Bell, CalendarDays, ChevronLeft, ChevronRight, MapPin, PackageCheck, Plus, Store, Truck, X } from 'lucide-react';
 import MobileMenuButton from './MobileMenuButton';
+import Modal from './Modal';
+import Input from './Input';
+import Button from './Button';
+import Select from './Select';
 
-const statCards = [
-  { label: 'Ready Now', value: 6, suffix: 'items', icon: Leaf, cardClass: 'border-emerald-100 bg-emerald-50/70', iconClass: 'bg-emerald-100 text-emerald-700' },
-  { label: 'This Week', value: 14, suffix: 'items', icon: CalendarDays, cardClass: 'border-amber-100 bg-amber-50/70', iconClass: 'bg-amber-100 text-amber-700' },
-  { label: 'This Month', value: 37, suffix: 'items', icon: CalendarDays, cardClass: 'border-sky-100 bg-sky-50/80', iconClass: 'bg-sky-100 text-sky-700' },
-  { label: 'Farmers', value: 8, suffix: 'active', icon: Sprout, cardClass: 'border-violet-100 bg-violet-50/80', iconClass: 'bg-violet-100 text-violet-700' }
-];
+const monthLabel = (value) =>
+  value.toLocaleDateString('en-BW', { month: 'long', year: 'numeric' });
 
-const dateCards = [
-  { day: 'Mon', date: 9 },
-  { day: 'Tue', date: 10 },
-  { day: 'Wed', date: 11 },
-  { day: 'Thu', date: 12, active: true },
-  { day: 'Fri', date: 13 },
-  { day: 'Sat', date: 14 },
-  { day: 'Sun', date: 15 },
-  { day: 'Mon', date: 16 }
-];
-
-const categoryChips = ['All', 'Fruits', 'Vegetables', 'Dairy', 'Poultry', 'Grains'];
-
-const scheduleItems = [
-  {
-    id: 'apples',
-    name: 'Red Apples',
-    category: 'Fruits',
-    badge: 'READY NOW',
-    farm: 'Green Valley Farm',
-    location: 'Gaborone',
-    available: '150 kg',
-    unit: 'Available',
-    image: 'https://images.unsplash.com/photo-1567306226416-28f0efdc88ce?auto=format&fit=crop&w=600&q=80'
-  },
-  {
-    id: 'eggs',
-    name: 'Free Range Eggs',
-    category: 'Poultry',
-    badge: 'READY NOW',
-    farm: 'Happy Hen Farm',
-    location: 'Gaborone',
-    available: '80 trays',
-    unit: 'Available',
-    image: 'https://images.unsplash.com/photo-1506976785307-8732e854ad03?auto=format&fit=crop&w=600&q=80'
-  },
-  {
-    id: 'spinach',
-    name: 'Baby Spinach Bundle',
-    category: 'Vegetables',
-    badge: 'TOMORROW',
-    farm: 'Fresh Fields Farm',
-    location: 'Gaborone',
-    available: '60 bundles',
-    unit: 'Available',
-    image: 'https://images.unsplash.com/photo-1576045057995-568f588f82fb?auto=format&fit=crop&w=600&q=80'
-  },
-  {
-    id: 'milk',
-    name: 'Fresh Dairy Milk',
-    category: 'Dairy',
-    badge: 'THIS WEEK',
-    farm: 'Moo Valley Dairy',
-    location: 'Gaborone',
-    available: '40 litres',
-    unit: 'Available',
-    image: 'https://images.unsplash.com/photo-1550583724-b2692b85b150?auto=format&fit=crop&w=600&q=80'
-  }
-];
-
-const badgeStyles = {
-  'READY NOW': 'bg-emerald-600 text-white',
-  TOMORROW: 'bg-sky-500 text-white',
-  'THIS WEEK': 'bg-violet-500 text-white'
+const typeConfig = {
+  ALL: { label: 'All', accent: 'bg-farm-green text-white' },
+  HARVEST: { label: 'Harvest', icon: PackageCheck, badge: 'bg-emerald-600 text-white', chip: 'bg-emerald-50 text-emerald-700' },
+  DELIVERY: { label: 'Delivery', icon: Truck, badge: 'bg-sky-500 text-white', chip: 'bg-sky-50 text-sky-700' },
+  MARKET: { label: 'Market', icon: Store, badge: 'bg-amber-500 text-white', chip: 'bg-amber-50 text-amber-700' },
+  REMINDER: { label: 'Reminder', icon: CalendarDays, badge: 'bg-violet-500 text-white', chip: 'bg-violet-50 text-violet-700' }
 };
 
-export default function HarvestCalendar({ items = [], showOwner = false }) {
-  const [selectedCategory, setSelectedCategory] = useState('All');
+const initialForm = {
+  title: '',
+  description: '',
+  eventDate: '',
+  type: 'REMINDER',
+  productId: '',
+  publicEvent: false
+};
 
-  const visibleItems = useMemo(() => {
-    if (selectedCategory === 'All') return scheduleItems;
-    return scheduleItems.filter((item) => item.category === selectedCategory);
-  }, [selectedCategory]);
+export default function HarvestCalendar({
+  events = [],
+  loading = false,
+  error = '',
+  selectedMonth,
+  onPreviousMonth,
+  onNextMonth,
+  onCreate,
+  onUpdate,
+  onDelete,
+  canManage = false
+}) {
+  const [selectedType, setSelectedType] = useState('ALL');
+  const [open, setOpen] = useState(false);
+  const [editing, setEditing] = useState(null);
+  const [form, setForm] = useState(initialForm);
 
-  const liveItemCount = items.length;
+  const visibleEvents = useMemo(() => {
+    if (selectedType === 'ALL') return events;
+    return events.filter((event) => event.type === selectedType);
+  }, [events, selectedType]);
+
+  const stats = useMemo(() => ({
+    HARVEST: events.filter((event) => event.type === 'HARVEST').length,
+    DELIVERY: events.filter((event) => event.type === 'DELIVERY').length,
+    MARKET: events.filter((event) => event.type === 'MARKET').length,
+    REMINDER: events.filter((event) => event.type === 'REMINDER').length
+  }), [events]);
+
+  const dateCards = useMemo(() => {
+    const start = new Date(selectedMonth.getFullYear(), selectedMonth.getMonth(), 1);
+    return Array.from({ length: 8 }, (_, index) => {
+      const date = new Date(start);
+      date.setDate(start.getDate() + index);
+      return {
+        key: date.toISOString(),
+        day: date.toLocaleDateString('en-BW', { weekday: 'short' }),
+        date: date.getDate(),
+        active: date.toDateString() === new Date().toDateString()
+      };
+    });
+  }, [selectedMonth]);
+
+  const openCreate = () => {
+    setEditing(null);
+    setForm({
+      ...initialForm,
+      eventDate: new Date(selectedMonth.getFullYear(), selectedMonth.getMonth(), 1).toISOString().slice(0, 10)
+    });
+    setOpen(true);
+  };
+
+  const openEdit = (event) => {
+    setEditing(event);
+    setForm({
+      title: event.title || '',
+      description: event.description || '',
+      eventDate: event.eventDate || '',
+      type: event.type || 'REMINDER',
+      productId: event.productId || '',
+      publicEvent: !!event.publicEvent
+    });
+    setOpen(true);
+  };
+
+  const submit = async () => {
+    const payload = {
+      title: form.title,
+      description: form.description || null,
+      eventDate: form.eventDate,
+      type: form.type,
+      productId: form.productId ? Number(form.productId) : null,
+      publicEvent: !!form.publicEvent
+    };
+    if (editing?.persistedId) {
+      await onUpdate(editing.persistedId, payload);
+    } else {
+      await onCreate(payload);
+    }
+    setOpen(false);
+    setEditing(null);
+  };
 
   return (
     <div className="space-y-3 pb-2">
@@ -105,35 +129,38 @@ export default function HarvestCalendar({ items = [], showOwner = false }) {
           </div>
 
           <div className="rounded-[24px] bg-white px-3.5 pb-3.5 pt-3 text-slate-900 shadow-[0_14px_36px_rgba(0,0,0,0.14)]">
-            <div className="max-w-[14rem]">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-emerald-700">Pula Harvest</p>
-              <h1 className="mt-1.5 text-[2rem] font-black leading-none text-slate-950">Harvest Calendar</h1>
-              <p className="mt-1 text-[15px] text-slate-600">Fresh produce, right on time.</p>
+            <div className="flex items-start justify-between gap-3">
+              <div className="max-w-[14rem]">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-emerald-700">Pula Harvest</p>
+                <h1 className="mt-1.5 text-[2rem] font-black leading-none text-slate-950">Harvest Calendar</h1>
+                <p className="mt-1 text-[15px] text-slate-600">Harvest, delivery, market, and reminder events from live APIs.</p>
+              </div>
+              {canManage ? (
+                <button type="button" onClick={openCreate} className="inline-flex h-10 items-center gap-1.5 rounded-full bg-farm-green px-3 text-xs font-semibold text-white">
+                  <Plus size={15} />
+                  Add
+                </button>
+              ) : null}
             </div>
 
             <div className="mt-3.5 grid grid-cols-2 gap-2 min-[430px]:grid-cols-4">
-              {statCards.map((card) => {
-                const Icon = card.icon;
+              {['HARVEST', 'DELIVERY', 'MARKET', 'REMINDER'].map((type) => {
+                const config = typeConfig[type];
+                const Icon = config.icon;
                 return (
-                  <div key={card.label} className={`rounded-[18px] border px-3 py-2.5 shadow-[0_8px_18px_rgba(15,23,42,0.05)] ${card.cardClass}`}>
-                    <div className={`flex h-8 w-8 items-center justify-center rounded-xl ${card.iconClass}`}>
+                  <div key={type} className="rounded-[18px] border border-emerald-100 bg-[#f8fbf6] px-3 py-2.5 shadow-[0_8px_18px_rgba(15,23,42,0.05)]">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-white text-farm-green">
                       <Icon size={15} />
                     </div>
-                    <p className="mt-2 text-[11px] font-semibold leading-tight text-slate-700">{card.label}</p>
+                    <p className="mt-2 text-[11px] font-semibold leading-tight text-slate-700">{config.label}</p>
                     <div className="mt-1">
-                      <span className="text-[2rem] font-black leading-none text-slate-950">{card.value}</span>
-                      <span className="block text-[11px] text-slate-500">{card.suffix}</span>
+                      <span className="text-[2rem] font-black leading-none text-slate-950">{stats[type]}</span>
+                      <span className="block text-[11px] text-slate-500">events</span>
                     </div>
                   </div>
                 );
               })}
             </div>
-
-            {liveItemCount ? (
-              <div className="mt-3 inline-flex rounded-full bg-emerald-50 px-2.5 py-1 text-[10px] font-semibold text-emerald-700">
-                Live calendar feed loaded: {liveItemCount} items
-              </div>
-            ) : null}
           </div>
         </div>
       </section>
@@ -141,46 +168,45 @@ export default function HarvestCalendar({ items = [], showOwner = false }) {
       <section className="rounded-[24px] bg-white p-3.5 shadow-soft">
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <h2 className="text-[1.2rem] font-black leading-none text-slate-950 min-[390px]:text-[1.35rem]">June 2026</h2>
+            <h2 className="text-[1.2rem] font-black leading-none text-slate-950 min-[390px]:text-[1.35rem]">{monthLabel(selectedMonth)}</h2>
             <div className="flex items-center gap-1 text-slate-400">
-              <button type="button" className="rounded-full p-1 hover:bg-slate-100" aria-label="Previous dates">
+              <button type="button" className="rounded-full p-1 hover:bg-slate-100" aria-label="Previous month" onClick={onPreviousMonth}>
                 <ChevronLeft size={17} />
               </button>
-              <button type="button" className="rounded-full p-1 hover:bg-slate-100" aria-label="Next dates">
+              <button type="button" className="rounded-full p-1 hover:bg-slate-100" aria-label="Next month" onClick={onNextMonth}>
                 <ChevronRight size={17} />
               </button>
             </div>
           </div>
-          <button type="button" className="inline-flex h-9 items-center gap-1.5 rounded-full border border-emerald-200 px-3 text-xs font-semibold text-farm-green">
+          <div className="inline-flex h-9 items-center gap-1.5 rounded-full border border-emerald-200 px-3 text-xs font-semibold text-farm-green">
             <CalendarDays size={15} />
-            Today
-          </button>
+            {events.length} items
+          </div>
         </div>
 
         <div className="-mx-1 mt-3 flex gap-2 overflow-x-auto px-1 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {dateCards.map((card) => (
-            <button
-              key={`${card.day}-${card.date}`}
-              type="button"
+            <div
+              key={card.key}
               className={`min-w-[58px] rounded-[16px] border px-2 py-2.5 text-center shadow-sm min-[390px]:min-w-[62px] ${card.active ? 'border-emerald-600 bg-emerald-600 text-white' : 'border-slate-100 bg-white text-slate-700'}`}
             >
               <p className={`text-xs ${card.active ? 'text-emerald-50' : 'text-slate-500'}`}>{card.day}</p>
               <p className="mt-1 text-[1.8rem] font-black leading-none">{card.date}</p>
               <span className={`mt-1.5 inline-block h-2 w-2 rounded-full ${card.active ? 'bg-yellow-300' : 'bg-emerald-600'}`} />
-            </button>
+            </div>
           ))}
         </div>
       </section>
 
       <section className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        {categoryChips.map((chip) => (
+        {Object.entries(typeConfig).map(([type, config]) => (
           <button
-            key={chip}
+            key={type}
             type="button"
-            onClick={() => setSelectedCategory(chip)}
-            className={`shrink-0 rounded-full px-4 py-2.5 text-[13px] font-semibold shadow-sm transition ${selectedCategory === chip ? 'bg-farm-green text-white' : 'bg-white text-slate-700'}`}
+            onClick={() => setSelectedType(type)}
+            className={`shrink-0 rounded-full px-4 py-2.5 text-[13px] font-semibold shadow-sm transition ${selectedType === type ? 'bg-farm-green text-white' : 'bg-white text-slate-700'}`}
           >
-            {chip}
+            {config.label}
           </button>
         ))}
       </section>
@@ -188,50 +214,87 @@ export default function HarvestCalendar({ items = [], showOwner = false }) {
       <section className="space-y-2.5">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-[1.7rem] font-black text-slate-950">Harvest schedule</h2>
-            {showOwner ? <p className="text-xs text-slate-500">Farmer details are included below.</p> : null}
+            <h2 className="text-[1.7rem] font-black text-slate-950">Schedule</h2>
+            <p className="text-xs text-slate-500">Only real backend events and generated product/order schedules are shown.</p>
           </div>
-          <button type="button" className="text-[13px] font-semibold text-farm-green">
-            View all
-          </button>
         </div>
 
+        {error ? <div className="rounded-[20px] border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-600">{error}</div> : null}
+        {loading ? <div className="rounded-[22px] bg-white p-4 text-sm text-slate-500 shadow-soft">Loading calendar events...</div> : null}
+        {!loading && !visibleEvents.length ? <div className="rounded-[22px] bg-white p-4 text-sm text-slate-500 shadow-soft">No calendar events found for this month.</div> : null}
+
         <div className="space-y-2.5">
-          {visibleItems.map((item) => (
-            <article key={item.id} className="overflow-hidden rounded-[22px] bg-white p-2.5 shadow-soft">
-              <div className="flex items-center gap-2.5">
-                <img src={item.image} alt={item.name} className="h-20 w-20 shrink-0 rounded-[18px] object-cover" />
-                <div className="min-w-0 flex-1">
-                  <span className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-bold ${badgeStyles[item.badge]}`}>
-                    {item.badge}
-                  </span>
-                  <h3 className="mt-1.5 text-[1.05rem] font-black leading-tight text-slate-950">{item.name}</h3>
-                  <div className="mt-1.5 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-xs text-slate-500">
-                    <span className="inline-flex items-center gap-1">
-                      <MapPin size={12} />
-                      {item.farm}
-                    </span>
-                    <span className="inline-flex items-center gap-1">
-                      <MapPin size={12} />
-                      {item.location}
-                    </span>
-                    {showOwner ? <span>{item.category}</span> : null}
+          {visibleEvents.map((event) => {
+            const config = typeConfig[event.type] || typeConfig.REMINDER;
+            const Icon = config.icon || CalendarDays;
+            return (
+              <article key={event.id} className="overflow-hidden rounded-[22px] bg-white p-3 shadow-soft">
+                <div className="flex items-start gap-3">
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[16px] bg-[#f4f8f1] text-farm-green">
+                    <Icon size={18} />
                   </div>
-                </div>
-                <div className="flex shrink-0 flex-col items-end gap-2">
-                  <div className="rounded-[16px] bg-emerald-50 px-2.5 py-2 text-right">
-                    <p className="text-lg font-black leading-none text-farm-green">{item.available}</p>
-                    <p className="mt-0.5 text-[10px] font-semibold text-emerald-700">{item.unit}</p>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-bold ${config.badge || 'bg-slate-700 text-white'}`}>
+                        {config.label}
+                      </span>
+                      <span className="text-xs font-semibold text-slate-500">{event.eventDate}</span>
+                      {event.generated ? <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-600">Generated</span> : null}
+                    </div>
+                    <h3 className="mt-1.5 text-[1.05rem] font-black leading-tight text-slate-950">{event.title}</h3>
+                    {event.description ? <p className="mt-1 text-xs leading-5 text-slate-600">{event.description}</p> : null}
+                    <div className="mt-1.5 flex flex-wrap items-center gap-2 text-xs text-slate-500">
+                      {event.productName ? <span className={`rounded-full px-2 py-1 ${config.chip || 'bg-slate-100 text-slate-700'}`}>{event.productName}</span> : null}
+                      {event.categoryName ? <span>{event.categoryName}</span> : null}
+                      {event.locationName ? <span className="inline-flex items-center gap-1"><MapPin size={12} />{event.locationName}</span> : null}
+                    </div>
                   </div>
-                  <button type="button" aria-label={`Open ${item.name}`} className="flex h-9 w-9 items-center justify-center rounded-full bg-farm-green text-white">
-                    <ChevronRight size={16} />
-                  </button>
+                  {event.editable && event.persistedId ? (
+                    <div className="flex shrink-0 flex-col gap-2">
+                      <button type="button" onClick={() => openEdit(event)} className="rounded-full bg-emerald-50 px-3 py-1 text-[11px] font-semibold text-farm-green">
+                        Edit
+                      </button>
+                      <button type="button" onClick={() => onDelete(event.persistedId)} className="rounded-full bg-red-50 px-3 py-1 text-[11px] font-semibold text-red-600">
+                        Delete
+                      </button>
+                    </div>
+                  ) : null}
                 </div>
-              </div>
-            </article>
-          ))}
+              </article>
+            );
+          })}
         </div>
       </section>
+
+      <Modal open={open} onClose={() => setOpen(false)} title={editing ? 'Edit Event' : 'Create Event'}>
+        <div className="space-y-3">
+          <Input placeholder="Event title" value={form.title} onChange={(event) => setForm((current) => ({ ...current, title: event.target.value }))} />
+          <textarea
+            className="min-h-24 w-full rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none"
+            placeholder="Description"
+            value={form.description}
+            onChange={(event) => setForm((current) => ({ ...current, description: event.target.value }))}
+          />
+          <Input type="date" value={form.eventDate} onChange={(event) => setForm((current) => ({ ...current, eventDate: event.target.value }))} />
+          <Select value={form.type} onChange={(event) => setForm((current) => ({ ...current, type: event.target.value }))}>
+            <option value="REMINDER">Reminder</option>
+            <option value="MARKET">Market</option>
+            <option value="HARVEST">Harvest</option>
+            <option value="DELIVERY">Delivery</option>
+          </Select>
+          <Input placeholder="Related product ID (optional)" value={form.productId} onChange={(event) => setForm((current) => ({ ...current, productId: event.target.value }))} />
+          <label className="flex items-center gap-2 text-sm text-slate-700">
+            <input type="checkbox" checked={form.publicEvent} onChange={(event) => setForm((current) => ({ ...current, publicEvent: event.target.checked }))} />
+            Public event (admin only)
+          </label>
+          <div className="flex justify-end gap-2">
+            <button type="button" className="rounded-xl border border-slate-200 px-3 py-2 text-sm" onClick={() => setOpen(false)}>
+              Cancel
+            </button>
+            <Button onClick={submit}>{editing ? 'Save changes' : 'Create event'}</Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }

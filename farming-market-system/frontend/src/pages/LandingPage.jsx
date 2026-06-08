@@ -11,32 +11,7 @@ import { getApprovedMarketplaceFeed } from '../services/marketplaceService';
 import { addToCart } from '../services/cartService';
 import { getApiErrorMessage } from '../utils/errorHandler';
 import { toMediaUrl } from '../utils/media';
-
-const fallbackImage = 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=900&q=80';
-
-const categoryVisuals = {
-  'Fresh Fruits': { label: 'FF', tint: 'from-emerald-100 to-lime-100' },
-  Vegetables: { label: 'VG', tint: 'from-emerald-100 to-green-100' },
-  Beverages: { label: 'BV', tint: 'from-cyan-100 to-sky-100' },
-  'Grocery & Staples': { label: 'GS', tint: 'from-orange-100 to-amber-100' },
-  'Frozen Food': { label: 'FR', tint: 'from-slate-100 to-blue-100' },
-  'Cooking Oil & Ghee': { label: 'OG', tint: 'from-yellow-100 to-amber-100' },
-  'Bakery & Snacks': { label: 'BK', tint: 'from-rose-100 to-orange-100' },
-  'Dairy & Eggs': { label: 'DE', tint: 'from-stone-100 to-yellow-50' },
-  'Household & Care': { label: 'HC', tint: 'from-violet-100 to-fuchsia-100' }
-};
-
-const defaultCategories = [
-  'Fresh Fruits',
-  'Vegetables',
-  'Beverages',
-  'Grocery & Staples',
-  'Frozen Food',
-  'Cooking Oil & Ghee',
-  'Bakery & Snacks',
-  'Dairy & Eggs',
-  'Household & Care'
-];
+import { CATEGORY_ORDER, CATEGORY_VISUALS } from '../data/categoryCatalog';
 
 export default function LandingPage() {
   const [publicProducts, setPublicProducts] = useState([]);
@@ -75,8 +50,8 @@ export default function LandingPage() {
   );
 
   const visibleCategories = useMemo(() => {
-    const apiCategories = categoryOptions.filter((item) => item !== 'ALL');
-    return [...defaultCategories, ...apiCategories.filter((item) => !defaultCategories.includes(item))];
+    const apiCategories = categoryOptions.filter((item) => item !== 'ALL' && CATEGORY_ORDER.includes(item));
+    return CATEGORY_ORDER.filter((item) => apiCategories.includes(item));
   }, [categoryOptions]);
 
   const filtered = useMemo(() => {
@@ -124,7 +99,7 @@ export default function LandingPage() {
     ...product,
     stock: product.quantity,
     farmer: product.farmerName || 'Farmer',
-    image: product.imageUrl ? toMediaUrl(product.imageUrl) : fallbackImage,
+    image: product.imageUrl ? toMediaUrl(product.imageUrl) : '',
     location: product.pickupAddress || product.locationName || 'Unknown',
     availabilityStatus: product.availabilityStatus || 'AVAILABLE',
     oldPrice
@@ -211,8 +186,8 @@ export default function LandingPage() {
           </div>
           <div className="-mx-1 flex snap-x gap-3 overflow-x-auto px-1 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {visibleCategories.map((category) => {
-              const active = selectedCategory === category || (category === 'Fresh Fruits' && selectedCategory === 'ALL');
-              const visual = categoryVisuals[category] || { label: 'FM', tint: 'from-emerald-100 to-lime-100' };
+              const active = selectedCategory === category;
+              const visual = CATEGORY_VISUALS[category] || { label: 'FM', tint: 'from-emerald-100 to-lime-100' };
               return (
                 <button
                   key={category}

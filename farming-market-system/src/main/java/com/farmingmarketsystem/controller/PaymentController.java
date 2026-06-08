@@ -1,8 +1,6 @@
 package com.farmingmarketsystem.controller;
 
 import com.farmingmarketsystem.dto.PaymentDtos;
-import com.farmingmarketsystem.model.PaymentStatus;
-import com.farmingmarketsystem.model.PaymentProvider;
 import com.farmingmarketsystem.service.OrderService;
 import com.farmingmarketsystem.service.OrangeMoneyPaymentService;
 import com.farmingmarketsystem.service.PaymentService;
@@ -64,17 +62,5 @@ public class PaymentController {
     public ResponseEntity<Void> myZakaCallback(@RequestBody PaymentDtos.CallbackRequest payload) {
         myZakaPaymentService.handleCallback(payload);
         return ResponseEntity.noContent().build();
-    }
-
-    @PostMapping("/mock/{paymentId}/confirm")
-    public ResponseEntity<PaymentDtos.Response> confirmMock(@PathVariable Long paymentId, @Valid @RequestBody PaymentDtos.MockConfirmRequest req) {
-        var payment = service.findById(paymentId);
-        payment.setStatus(req.paid() ? PaymentStatus.PAID : PaymentStatus.FAILED);
-        payment.setUpdatedAt(java.time.Instant.now());
-        var saved = service.save(payment);
-        if (req.paid() && (payment.getProvider() == PaymentProvider.ORANGE_MONEY || payment.getProvider() == PaymentProvider.MYZAKA || payment.getProvider() == PaymentProvider.CARD)) {
-            orderService.confirmOnlinePayment(payment.getOrder().getId());
-        }
-        return ResponseEntity.ok(saved);
     }
 }

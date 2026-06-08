@@ -4,10 +4,8 @@ import AppLayout from '../../layouts/AppLayout';
 import DataTable from '../../components/DataTable';
 import EmptyState from '../../components/EmptyState';
 import LoadingSpinner from '../../components/LoadingSpinner';
-import Input from '../../components/Input';
-import Button from '../../components/Button';
 import { getUsers, disableUser, getAllProducts, getAllOrdersAdmin, getAllFarmers, getDeliveries, assignDelivery } from '../../services/adminService';
-import { getCategories, createCategory, updateCategory, deleteCategory } from '../../services/categoryService';
+import { getCategories, updateCategory, deleteCategory } from '../../services/categoryService';
 import { getApiErrorMessage } from '../../utils/errorHandler';
 
 const links = [{ path: '/admin/dashboard', label: 'Dashboard' }, { path: '/admin/users', label: 'Users' }, { path: '/admin/farmers', label: 'Farmers' }, { path: '/admin/products', label: 'Products' }, { path: '/admin/orders', label: 'Orders' }, { path: '/admin/categories', label: 'Categories' }, { path: '/admin/deliveries', label: 'Deliveries' }];
@@ -17,8 +15,6 @@ export default function AdminManagementPage() {
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [categoryName, setCategoryName] = useState('');
-  const [categoryDescription, setCategoryDescription] = useState('');
 
   const kind = useMemo(() => {
     if (pathname.endsWith('/users')) return 'users';
@@ -56,26 +52,21 @@ export default function AdminManagementPage() {
     load();
   };
 
-  const onAddCategory = async () => {
-    if (!categoryName.trim()) return;
-    await createCategory({ name: categoryName, description: categoryDescription });
-    setCategoryName('');
-    setCategoryDescription('');
-    load();
-  };
-
   const onEditCategory = async (row) => {
-    const name = prompt('Category name', row.name);
-    if (!name) return;
     const description = prompt('Category description', row.description || '');
-    await updateCategory(row.id, { name, description });
+    if (description == null) return;
+    await updateCategory(row.id, { name: row.name, description });
     load();
   };
 
   const onDeleteCategory = async (id) => {
-    if (!confirm('Delete category?')) return;
-    await deleteCategory(id);
-    load();
+    try {
+      if (!confirm('Delete category?')) return;
+      await deleteCategory(id);
+      load();
+    } catch (e) {
+      alert(getApiErrorMessage(e, 'System categories cannot be deleted.'));
+    }
   };
 
   const onAssignDelivery = async (row) => {
@@ -101,5 +92,5 @@ export default function AdminManagementPage() {
     columns = [{ key: 'id', title: 'ID' }, { key: 'orderId', title: 'Order' }, { key: 'deliveryAgentId', title: 'Agent ID' }, { key: 'status', title: 'Status' }];
   }
 
-  return <AppLayout links={links}><h1 className='text-xl font-semibold mb-4'>{title}</h1>{kind === 'categories' && <div className='card p-4 mb-4 grid md:grid-cols-3 gap-2'><Input placeholder='Category Name' value={categoryName} onChange={(e) => setCategoryName(e.target.value)} /><Input placeholder='Description' value={categoryDescription} onChange={(e) => setCategoryDescription(e.target.value)} /><Button onClick={onAddCategory}>Add Category</Button></div>}{rows.length ? <DataTable columns={columns} rows={rows} mobileRender={(r) => <div>{JSON.stringify(r)}</div>} /> : <EmptyState title='No records' subtitle='No data available.' />}</AppLayout>;
+  return <AppLayout links={links}><h1 className='text-xl font-semibold mb-4'>{title}</h1>{kind === 'categories' ? <div className='card p-4 mb-4 text-sm text-slate-600'>Category taxonomy is fixed to Fresh Produce, Fruits, Grains & Crops, and Livestock. You can update descriptions, but not create or remove extra categories.</div> : null}{rows.length ? <DataTable columns={columns} rows={rows} mobileRender={(r) => <div>{JSON.stringify(r)}</div>} /> : <EmptyState title='No records' subtitle='No data available.' />}</AppLayout>;
 }

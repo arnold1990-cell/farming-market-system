@@ -39,6 +39,7 @@ public class SecurityConfig {
                                 "/api/farmers/nearby",
                                 "/api/farmers/public/**",
                                 "/api/public/**",
+                                "/api/calendar/events",
                                 "/api/marketplace/**",
                                 "/api/products",
                                 "/api/products/map",
@@ -57,7 +58,6 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/location/update").hasAnyRole("FARMER", "ADMIN")
                         .requestMatchers("/api/farmer/**", "/api/products/my-products", "/api/products/farmer/dashboard", "/api/orders/farmer", "/api/products/*/orders", "/api/payments/cash/**").hasAnyRole("FARMER","ADMIN")
                         .requestMatchers("/api/delivery/agent/**").hasRole("DELIVERY_AGENT")
-                        .requestMatchers("/api/payments/mock/**").hasRole("ADMIN")
                         .requestMatchers("/api/admin/**", "/api/categories/**", "/api/users/**", "/api/orders/all", "/api/delivery/assign").hasRole("ADMIN")
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);

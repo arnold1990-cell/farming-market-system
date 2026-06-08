@@ -12,8 +12,6 @@ import { getApiErrorMessage } from '../utils/errorHandler';
 import api from '../services/api';
 import { toMediaUrl } from '../utils/media';
 
-const fallbackImage = 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=900&q=80';
-
 export default function ProductDetailsPage() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -62,8 +60,8 @@ export default function ProductDetailsPage() {
 
   useEffect(() => {
     if (!product) return;
-    const first = orderedImages[0]?.imageUrl || product.imageUrl || fallbackImage;
-    setActiveImage(toMediaUrl(first));
+    const first = orderedImages[0]?.imageUrl || product.imageUrl || '';
+    setActiveImage(first ? toMediaUrl(first) : '');
   }, [product, orderedImages]);
 
   const onAdd = async () => {
@@ -110,30 +108,28 @@ export default function ProductDetailsPage() {
           </div>
 
           <div className="rounded-[28px] bg-gradient-to-b from-[#EAF7ED] to-[#F7FBF8] p-3">
-            <img
-              src={activeImage || fallbackImage}
-              onError={(e) => {
-                e.currentTarget.src = fallbackImage;
-              }}
-              className="h-72 w-full rounded-[24px] object-cover"
-            />
+            {activeImage ? (
+              <img
+                src={activeImage}
+                onError={() => setActiveImage('')}
+                className="h-72 w-full rounded-[24px] object-cover"
+              />
+            ) : (
+              <div className="grid h-72 w-full place-items-center rounded-[24px] bg-gradient-to-br from-emerald-100 to-lime-50 text-sm font-semibold text-emerald-800">
+                No product image
+              </div>
+            )}
           </div>
 
           <div className="grid grid-cols-4 gap-2">
-            {(orderedImages.length ? orderedImages : [{ id: 'single', imageUrl: product.imageUrl }]).map((img) => (
+            {(orderedImages.length ? orderedImages : product.imageUrl ? [{ id: 'single', imageUrl: product.imageUrl }] : []).map((img) => (
               <button
                 type="button"
                 key={img.id}
-                onClick={() => setActiveImage(toMediaUrl(img.imageUrl || fallbackImage))}
+                onClick={() => setActiveImage(img.imageUrl ? toMediaUrl(img.imageUrl) : '')}
                 className="rounded-[18px] bg-[#F5F8F6] p-1.5"
               >
-                <img
-                  src={toMediaUrl(img.imageUrl || fallbackImage)}
-                  onError={(e) => {
-                    e.currentTarget.src = fallbackImage;
-                  }}
-                  className="h-14 w-full rounded-[14px] object-cover"
-                />
+                {img.imageUrl ? <img src={toMediaUrl(img.imageUrl)} onError={(e) => { e.currentTarget.style.display = 'none'; }} className="h-14 w-full rounded-[14px] object-cover" /> : null}
               </button>
             ))}
           </div>
