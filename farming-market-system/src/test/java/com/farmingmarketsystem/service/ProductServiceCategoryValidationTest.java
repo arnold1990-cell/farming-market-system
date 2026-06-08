@@ -5,6 +5,7 @@ import com.farmingmarketsystem.exception.BadRequestException;
 import com.farmingmarketsystem.model.Currency;
 import com.farmingmarketsystem.model.User;
 import com.farmingmarketsystem.repository.CategoryRepository;
+import com.farmingmarketsystem.repository.FarmerProfileRepository;
 import com.farmingmarketsystem.repository.ProductImageRepository;
 import com.farmingmarketsystem.repository.ProductRepository;
 import com.farmingmarketsystem.repository.ReviewRepository;
@@ -30,6 +31,7 @@ class ProductServiceCategoryValidationTest {
     @Mock private UserRepository userRepository;
     @Mock private ReviewRepository reviewRepository;
     @Mock private ProductImageRepository productImageRepository;
+    @Mock private FarmerProfileRepository farmerProfileRepository;
     private ProductService productService;
 
     @BeforeEach
@@ -40,7 +42,8 @@ class ProductServiceCategoryValidationTest {
                 userRepository,
                 reviewRepository,
                 productImageRepository,
-                null
+                null,
+                farmerProfileRepository
         );
     }
 

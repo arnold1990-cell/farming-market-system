@@ -5,12 +5,13 @@ import Button from '../../components/Button';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import EmptyState from '../../components/EmptyState';
 import ToastStack from '../../components/ToastStack';
-import MapboxLocationPicker from '../../components/MapboxLocationPicker';
-import { deleteProduct, deleteProductImage, getProductById, getProductOrders, reorderProductImages, setPrimaryImage, updateProductAvailability } from '../../services/productService';
-import { getApiErrorMessage } from '../../utils/errorHandler';
 import DataTable from '../../components/DataTable';
 import Modal from '../../components/Modal';
+import ProductDetailsView from '../../components/ProductDetailsView';
+import { deleteProduct, deleteProductImage, getProductById, getProductOrders, reorderProductImages, setPrimaryImage, updateProductAvailability } from '../../services/productService';
+import { getApiErrorMessage } from '../../utils/errorHandler';
 import { toMediaUrl } from '../../utils/media';
+import api from '../../services/api';
 
 export default function FarmerProductDetailsPage() {
   const { id } = useParams();
@@ -18,6 +19,7 @@ export default function FarmerProductDetailsPage() {
   const links = [{ path: '/farmer/dashboard', label: 'Dashboard' }, { path: '/farmer/products', label: 'Products' }, { path: '/farmer/orders', label: 'Orders' }, { path: '/marketplace', label: 'Marketplace' }];
   const [product, setProduct] = useState(null);
   const [orders, setOrders] = useState([]);
+  const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [toasts, setToasts] = useState([]);
@@ -25,31 +27,38 @@ export default function FarmerProductDetailsPage() {
   const [dragInfo, setDragInfo] = useState(null);
 
   const pushToast = (message, type = 'success') => {
-    const id = Date.now() + Math.random();
-    setToasts((prev) => [...prev, { id, message, type }]);
-    setTimeout(() => setToasts((prev) => prev.filter((t) => t.id !== id)), 3500);
+    const toastId = Date.now() + Math.random();
+    setToasts((prev) => [...prev, { id: toastId, message, type }]);
+    setTimeout(() => setToasts((prev) => prev.filter((toast) => toast.id !== toastId)), 3500);
   };
 
   const load = async () => {
     try {
-      const [p, os] = await Promise.all([getProductById(id), getProductOrders(id).catch(() => [])]);
-      setProduct(p);
-      setOrders(os || []);
-    } catch (e) {
-      setError(getApiErrorMessage(e, 'Failed to load product details'));
+      const [productResponse, orderResponse, reviewResponse] = await Promise.all([
+        getProductById(id),
+        getProductOrders(id).catch(() => []),
+        api.get(`/reviews/products/${id}`).then((response) => response.data).catch(() => [])
+      ]);
+      setProduct(productResponse);
+      setOrders(orderResponse || []);
+      setReviews(reviewResponse || []);
+    } catch (err) {
+      setError(getApiErrorMessage(err, 'Failed to load product details'));
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => { load(); }, [id]);
+  useEffect(() => {
+    load();
+  }, [id]);
 
   const onDelete = async () => {
     try {
       await deleteProduct(id);
       navigate('/farmer/products');
-    } catch (e) {
-      pushToast(getApiErrorMessage(e, 'Failed to delete product'), 'error');
+    } catch (err) {
+      pushToast(getApiErrorMessage(err, 'Failed to delete product'), 'error');
     }
   };
 
@@ -58,8 +67,8 @@ export default function FarmerProductDetailsPage() {
       const updated = await updateProductAvailability(id, availabilityStatus);
       setProduct(updated);
       pushToast(`Product marked as ${availabilityStatus}`, 'success');
-    } catch (e) {
-      pushToast(getApiErrorMessage(e, 'Failed to update availability'), 'error');
+    } catch (err) {
+      pushToast(getApiErrorMessage(err, 'Failed to update availability'), 'error');
     }
   };
 
@@ -68,8 +77,8 @@ export default function FarmerProductDetailsPage() {
       const updated = await setPrimaryImage(imageId);
       setProduct(updated);
       pushToast('Primary image updated', 'success');
-    } catch (e) {
-      pushToast(getApiErrorMessage(e, 'Failed to set primary image'), 'error');
+    } catch (err) {
+      pushToast(getApiErrorMessage(err, 'Failed to set primary image'), 'error');
     }
   };
 
@@ -78,36 +87,114 @@ export default function FarmerProductDetailsPage() {
       await deleteProductImage(imageId);
       await load();
       pushToast('Image deleted', 'success');
-    } catch (e) {
-      pushToast(getApiErrorMessage(e, 'Failed to delete image'), 'error');
+    } catch (err) {
+      pushToast(getApiErrorMessage(err, 'Failed to delete image'), 'error');
     }
   };
 
   const onDragStart = (group, index) => setDragInfo({ group, index });
   const onDrop = async (group, index) => {
     if (!dragInfo || dragInfo.group !== group || dragInfo.index === index) return;
-    const arr = [...(groups[group] || [])];
-    const [moved] = arr.splice(dragInfo.index, 1);
-    arr.splice(index, 0, moved);
+    const items = [...(groups[group] || [])];
+    const [moved] = items.splice(dragInfo.index, 1);
+    items.splice(index, 0, moved);
     setDragInfo(null);
     try {
-      await reorderProductImages(id, group, arr.map((i) => i.id));
+      await reorderProductImages(id, group, items.map((item) => item.id));
       await load();
       pushToast('Image order updated', 'success');
-    } catch (e) {
-      pushToast(getApiErrorMessage(e, 'Failed to reorder images'), 'error');
+    } catch (err) {
+      pushToast(getApiErrorMessage(err, 'Failed to reorder images'), 'error');
     }
   };
 
   if (loading) return <AppLayout links={links}><LoadingSpinner /></AppLayout>;
-  if (error || !product) return <AppLayout links={links}><EmptyState title='Error' subtitle={error || 'Product not found'} /></AppLayout>;
+  if (error || !product) return <AppLayout links={links}><EmptyState title="Error" subtitle={error || 'Product not found'} /></AppLayout>;
 
   const groups = {
-    FIELD: product.images?.filter((i) => i.imageType === 'FIELD') || [],
-    HARVEST: product.images?.filter((i) => i.imageType === 'HARVEST') || [],
-    PRODUCT: product.images?.filter((i) => i.imageType === 'PRODUCT') || [],
-    PACKAGING: product.images?.filter((i) => i.imageType === 'PACKAGING') || []
+    FIELD: product.images?.filter((image) => image.imageType === 'FIELD') || [],
+    HARVEST: product.images?.filter((image) => image.imageType === 'HARVEST') || [],
+    PRODUCT: product.images?.filter((image) => image.imageType === 'PRODUCT') || [],
+    PACKAGING: product.images?.filter((image) => image.imageType === 'PACKAGING') || []
   };
 
-  return <AppLayout links={links}><ToastStack toasts={toasts} onClose={(id) => setToasts((prev) => prev.filter((t) => t.id !== id))} /><div className='space-y-4'><div className='flex justify-between'><h1 className='text-2xl font-semibold'>{product.name}</h1><div className='flex gap-2'><Button className='bg-white text-farm-green border' onClick={() => navigate('/farmer/products')}>Back</Button><Button className='bg-amber-600' onClick={() => onSetAvailability('SOLD')}>Mark as Sold</Button><Button className='bg-farm-green' onClick={() => onSetAvailability('AVAILABLE')}>Mark as Available</Button><Button className='bg-red-600' onClick={() => setConfirmOpen(true)}>Delete</Button></div></div><div className='card p-4 grid md:grid-cols-2 gap-4'><div className='space-y-2 text-sm'><p><b>Price:</b> {product.currency} {product.price}/{product.unit}</p><p><b>Quantity:</b> {product.quantity}</p><p><b>Category:</b> {product.categoryId}</p><p><b>Harvest:</b> {product.harvestStatus}</p><p><b>Availability:</b> {product.availabilityStatus || (product.available ? 'AVAILABLE' : 'OUT_OF_STOCK')}</p><p><b>Pickup Address:</b> {product.pickupAddress || product.locationName || '-'}</p><p><b>Coordinates:</b> {product.pickupLatitude ?? '-'}, {product.pickupLongitude ?? '-'}</p><p><b>Organic:</b> {String(product.organic)}</p><p><b>Delivery Available:</b> {String(product.deliveryAvailable)}</p></div><div>{product.pickupLatitude && product.pickupLongitude ? <MapboxLocationPicker latitude={product.pickupLatitude} longitude={product.pickupLongitude} onLocationChange={() => {}} height={240} /> : <EmptyState title='No map location' subtitle='No GPS coordinates were set.' />}</div></div><div className='grid md:grid-cols-2 gap-4'>{Object.entries(groups).map(([k, arr]) => <div key={k} className='card p-3'><h3 className='font-semibold mb-2'>{k} Images <span className='text-xs text-gray-500'>(drag to reorder)</span></h3>{arr.length ? <div className='grid grid-cols-3 gap-2'>{arr.map((img, idx) => <div key={img.id} className='relative' draggable onDragStart={() => onDragStart(k, idx)} onDragOver={(e) => e.preventDefault()} onDrop={() => onDrop(k, idx)}><img src={toMediaUrl(img.imageUrl)} className='h-20 w-full object-cover rounded' /><div className='absolute bottom-1 left-1 flex gap-1'><button onClick={() => onSetPrimary(img.id)} className='text-[10px] bg-white px-1 rounded border'>Primary</button><button onClick={() => onDeleteImage(img.id)} className='text-[10px] bg-red-50 text-red-700 px-1 rounded border border-red-200'>Delete</button></div></div>)}</div> : <p className='text-sm text-gray-500'>No images</p>}</div>)}</div><div className='card p-4'><h3 className='font-semibold mb-2'>Orders Related to Product</h3>{orders.length ? <DataTable columns={[{ key: 'id', title: 'Order' }, { key: 'status', title: 'Status' }, { key: 'totalAmount', title: 'Total' }]} rows={orders.map(o => ({ ...o, id: `#${o.id}` }))} mobileRender={(r) => <div>{r.id} - {r.status}</div>} /> : <p className='text-sm text-gray-500'>No related orders yet.</p>}</div></div><Modal open={confirmOpen} onClose={() => setConfirmOpen(false)} title='Delete Product'><div className='space-y-4'><p className='text-sm text-gray-600'>Delete this product? This action cannot be undone.</p><div className='flex justify-end gap-2'><button className='px-3 py-2 rounded-xl border' onClick={() => setConfirmOpen(false)}>Cancel</button><Button className='bg-red-600' onClick={onDelete}>Delete</Button></div></div></Modal></AppLayout>;
+  const actionPanel = (
+    <section className="rounded-[28px] bg-white p-4 shadow-soft">
+      <div className="flex flex-wrap gap-2">
+        <Button className="bg-white text-farm-green border" onClick={() => navigate('/farmer/products')}>Back to listings</Button>
+        <Button className="bg-amber-600" onClick={() => onSetAvailability('SOLD')}>Mark as Sold</Button>
+        <Button className="bg-farm-green" onClick={() => onSetAvailability('AVAILABLE')}>Mark as Available</Button>
+        <Button className="bg-red-600" onClick={() => setConfirmOpen(true)}>Delete</Button>
+      </div>
+    </section>
+  );
+
+  return (
+    <AppLayout links={links}>
+      <ToastStack toasts={toasts} onClose={(toastId) => setToasts((prev) => prev.filter((toast) => toast.id !== toastId))} />
+      <div className="space-y-4">
+        <ProductDetailsView
+          product={product}
+          reviews={reviews}
+          onBack={() => navigate('/farmer/products')}
+          showPurchaseActions={false}
+          actionPanel={actionPanel}
+        />
+
+        <section className="grid gap-4 md:grid-cols-2">
+          {Object.entries(groups).map(([group, images]) => (
+            <div key={group} className="rounded-[28px] bg-white p-4 shadow-soft">
+              <h3 className="font-semibold text-slate-900">{group} Images</h3>
+              <p className="mt-1 text-xs text-slate-500">Drag to reorder. Set a primary product image or remove outdated uploads.</p>
+              {images.length ? (
+                <div className="mt-3 grid grid-cols-3 gap-2">
+                  {images.map((image, index) => (
+                    <div
+                      key={image.id}
+                      className="relative"
+                      draggable
+                      onDragStart={() => onDragStart(group, index)}
+                      onDragOver={(event) => event.preventDefault()}
+                      onDrop={() => onDrop(group, index)}
+                    >
+                      <img src={toMediaUrl(image.imageUrl)} alt={group} className="h-20 w-full rounded-xl object-cover" />
+                      <div className="absolute bottom-1 left-1 flex gap-1">
+                        <button type="button" onClick={() => onSetPrimary(image.id)} className="rounded border bg-white px-1 text-[10px]">Primary</button>
+                        <button type="button" onClick={() => onDeleteImage(image.id)} className="rounded border border-red-200 bg-red-50 px-1 text-[10px] text-red-700">Delete</button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="mt-3 text-sm text-slate-500">No images uploaded.</p>
+              )}
+            </div>
+          ))}
+        </section>
+
+        <section className="rounded-[28px] bg-white p-4 shadow-soft">
+          <h3 className="mb-2 font-semibold text-slate-900">Orders Related to Product</h3>
+          {orders.length ? (
+            <DataTable
+              columns={[{ key: 'id', title: 'Order' }, { key: 'status', title: 'Status' }, { key: 'totalAmount', title: 'Total' }]}
+              rows={orders.map((order) => ({ ...order, id: `#${order.id}` }))}
+              mobileRender={(row) => <div>{row.id} - {row.status}</div>}
+            />
+          ) : (
+            <p className="text-sm text-slate-500">No related orders yet.</p>
+          )}
+        </section>
+      </div>
+
+      <Modal open={confirmOpen} onClose={() => setConfirmOpen(false)} title="Delete Product">
+        <div className="space-y-4">
+          <p className="text-sm text-gray-600">Delete this product? This action cannot be undone.</p>
+          <div className="flex justify-end gap-2">
+            <button className="rounded-xl border px-3 py-2" onClick={() => setConfirmOpen(false)}>Cancel</button>
+            <Button className="bg-red-600" onClick={onDelete}>Delete</Button>
+          </div>
+        </div>
+      </Modal>
+    </AppLayout>
+  );
 }

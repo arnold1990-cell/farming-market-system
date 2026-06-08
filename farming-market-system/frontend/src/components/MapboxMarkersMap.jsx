@@ -47,7 +47,8 @@ export default function MapboxMarkersMap({ markers = [], height = 320 }) {
           m.price != null ? `<div>BWP ${Number(m.price).toFixed(2)} / ${m.unit || 'unit'}</div>` : '',
           m.quantity != null ? `<div>Qty: ${m.quantity}</div>` : '',
           m.harvestStatus ? `<div>${String(m.harvestStatus).replaceAll('_', ' ')}</div>` : '',
-          m.locationName ? `<div>${m.locationName}</div>` : ''
+          m.locationName ? `<div>${m.locationName}</div>` : '',
+          m.productId ? `<div style="margin-top:8px"><a href="/products/${m.productId}" style="color:#0b9441;font-weight:600;text-decoration:none">View product</a></div>` : ''
         ].filter(Boolean).join('');
         marker.setPopup(new mapboxgl.Popup({ offset: 20 }).setHTML(lines));
       }

@@ -32,6 +32,7 @@ public class ProductService {
     private final ReviewRepository reviewRepository;
     private final ProductImageRepository productImageRepository;
     private final OrderService orderService;
+    private final FarmerProfileRepository farmerProfileRepository;
 
     @Value("${app.upload.products-dir:uploads/products}")
     private String productsUploadDir;
@@ -281,6 +282,7 @@ public class ProductService {
         String categoryName = p.getCategory() != null ? p.getCategory().getName() : null;
         Long farmerId = p.getFarmer() != null ? p.getFarmer().getId() : null;
         String farmerName = p.getFarmer() != null ? p.getFarmer().getFullName() : null;
+        FarmerProfile farmerProfile = farmerId == null ? null : farmerProfileRepository.findByUserId(farmerId).orElse(null);
         return new ProductDtos.ProductResponse(
                 p.getId(),
                 p.getName(),
@@ -297,6 +299,13 @@ public class ProductService {
                 categoryName,
                 farmerId,
                 farmerName,
+                farmerProfile != null ? farmerProfile.getFarmName() : null,
+                farmerProfile != null ? farmerProfile.getLocation() : null,
+                farmerProfile != null ? farmerProfile.getPhysicalAddress() : null,
+                farmerProfile != null ? farmerProfile.getCity() : null,
+                farmerProfile != null ? farmerProfile.getCountry() : null,
+                farmerProfile != null ? farmerProfile.getDescription() : null,
+                farmerProfile != null ? farmerProfile.getContactNumber() : null,
                 p.getLocationName(),
                 p.getPickupAddress(),
                 p.getLatitude(),

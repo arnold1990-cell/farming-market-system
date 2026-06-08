@@ -246,9 +246,17 @@ export default function FarmerProductsPage() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {filtered.map((p) => (
               <div key={p.id} className="card overflow-hidden">
-                <img src={p.imageUrl ? toMediaUrl(p.imageUrl) : 'https://images.unsplash.com/photo-1542838132-92c53300491e'} className="h-44 w-full object-cover" />
+                <Link to={`/farmer/products/${p.id}`} className="block">
+                  {p.imageUrl ? (
+                    <img src={toMediaUrl(p.imageUrl)} className="h-44 w-full object-cover" />
+                  ) : (
+                    <div className="grid h-44 w-full place-items-center bg-gradient-to-br from-emerald-100 to-lime-50 text-sm font-semibold text-emerald-800">
+                      No product image
+                    </div>
+                  )}
+                </Link>
                 <div className="p-4 space-y-2">
-                  <p className="font-semibold text-lg">{p.name}</p>
+                  <Link to={`/farmer/products/${p.id}`} className="block text-lg font-semibold text-slate-900">{p.name}</Link>
                   <p>{p.currency} {p.price}/{p.unit}</p>
                   <p className="text-sm text-gray-600">Category: {p.categoryName || '-'}</p>
                   <p className="text-sm">Stock: {p.quantity}</p>

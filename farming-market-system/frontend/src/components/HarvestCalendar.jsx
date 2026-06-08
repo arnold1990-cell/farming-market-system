@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
-import { Bell, CalendarDays, ChevronLeft, ChevronRight, MapPin, PackageCheck, Plus, Store, Truck, X } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { ArrowRight, Bell, CalendarDays, ChevronLeft, ChevronRight, MapPin, PackageCheck, Plus, Store, Truck } from 'lucide-react';
 import MobileMenuButton from './MobileMenuButton';
 import Modal from './Modal';
 import Input from './Input';
@@ -244,11 +245,21 @@ export default function HarvestCalendar({
                     <h3 className="mt-1.5 text-[1.05rem] font-black leading-tight text-slate-950">{event.title}</h3>
                     {event.description ? <p className="mt-1 text-xs leading-5 text-slate-600">{event.description}</p> : null}
                     <div className="mt-1.5 flex flex-wrap items-center gap-2 text-xs text-slate-500">
-                      {event.productName ? <span className={`rounded-full px-2 py-1 ${config.chip || 'bg-slate-100 text-slate-700'}`}>{event.productName}</span> : null}
+                      {event.productName && event.productId ? (
+                        <Link to={`/products/${event.productId}`} className={`rounded-full px-2 py-1 ${config.chip || 'bg-slate-100 text-slate-700'}`}>
+                          {event.productName}
+                        </Link>
+                      ) : null}
+                      {event.productName && !event.productId ? <span className={`rounded-full px-2 py-1 ${config.chip || 'bg-slate-100 text-slate-700'}`}>{event.productName}</span> : null}
                       {event.categoryName ? <span>{event.categoryName}</span> : null}
                       {event.locationName ? <span className="inline-flex items-center gap-1"><MapPin size={12} />{event.locationName}</span> : null}
                     </div>
                   </div>
+                  {event.productId ? (
+                    <Link to={`/products/${event.productId}`} className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-farm-green text-white">
+                      <ArrowRight size={16} />
+                    </Link>
+                  ) : null}
                   {event.editable && event.persistedId ? (
                     <div className="flex shrink-0 flex-col gap-2">
                       <button type="button" onClick={() => openEdit(event)} className="rounded-full bg-emerald-50 px-3 py-1 text-[11px] font-semibold text-farm-green">

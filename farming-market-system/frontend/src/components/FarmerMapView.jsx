@@ -4,6 +4,7 @@ export default function FarmerMapView({ products = [], height = 320 }) {
   const markers = products
     .filter((p) => p.latitude != null && p.longitude != null)
     .map((p) => ({
+      productId: p.productId || p.id,
       latitude: p.latitude,
       longitude: p.longitude,
       name: p.name || p.productName,

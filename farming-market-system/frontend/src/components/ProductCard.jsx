@@ -1,8 +1,9 @@
 import { Heart, MapPin, ShoppingCart, Star } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 
 export default function ProductCard({ product, onAdd }) {
+  const navigate = useNavigate();
   const [imgSrc, setImgSrc] = useState(product.image || '');
   const status = product.availabilityStatus || 'AVAILABLE';
   const disabled = status !== 'AVAILABLE';
@@ -21,9 +22,25 @@ export default function ProductCard({ product, onAdd }) {
       PACKAGED: 'Packed',
       READY_FOR_DELIVERY: 'Ready for Delivery'
     }[product.harvestStatus] || 'Ready Now';
+  const ratingValue = product.averageRating ? Number(product.averageRating).toFixed(1) : 'Not rated';
+
+  const openDetails = () => {
+    if (product.id) navigate(`/products/${product.id}`);
+  };
 
   return (
-    <article className="group overflow-hidden rounded-[26px] border border-[#EEF3EF] bg-white p-2.5 shadow-[0_16px_36px_rgba(15,23,42,0.08)] transition duration-200 active:scale-[0.99]">
+    <article
+      role="link"
+      tabIndex={0}
+      onClick={openDetails}
+      onKeyDown={(event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          openDetails();
+        }
+      }}
+      className="group cursor-pointer overflow-hidden rounded-[26px] border border-[#EEF3EF] bg-white p-2.5 shadow-[0_16px_36px_rgba(15,23,42,0.08)] transition duration-200 active:scale-[0.99]"
+    >
       <div className="relative rounded-[20px] bg-[#F0F7F1] p-2">
         {imgSrc ? (
           <img
@@ -43,7 +60,7 @@ export default function ProductCard({ product, onAdd }) {
             -{discount}%
           </span>
         ) : null}
-        <button type="button" className="absolute right-3 top-3 rounded-full bg-white/95 p-1.5 text-gray-600 shadow-sm">
+        <button type="button" onClick={(event) => event.stopPropagation()} className="absolute right-3 top-3 rounded-full bg-white/95 p-1.5 text-gray-600 shadow-sm">
           <Heart size={14} />
         </button>
       </div>
@@ -56,7 +73,7 @@ export default function ProductCard({ product, onAdd }) {
           </div>
           <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-1 text-[10px] font-semibold text-amber-700">
             <Star size={10} className="fill-amber-400 text-amber-400" />
-            {product.averageRating ? Number(product.averageRating).toFixed(1) : '4.8'}
+            {ratingValue}
           </span>
         </div>
 
@@ -88,14 +105,21 @@ export default function ProductCard({ product, onAdd }) {
         </div>
 
         <div className="flex items-center justify-between gap-2 pt-1">
-          <Link
-            to={`/products/${product.id}`}
+          <button
+            type="button"
+            onClick={(event) => {
+              event.stopPropagation();
+              openDetails();
+            }}
             className="inline-flex items-center justify-center rounded-full border border-emerald-100 bg-emerald-50 px-3 py-2 text-[11px] font-semibold text-farm-green"
           >
             View details
-          </Link>
+          </button>
           <button
-            onClick={onAdd}
+            onClick={(event) => {
+              event.stopPropagation();
+              onAdd?.();
+            }}
             disabled={disabled}
             className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-farm-green text-white shadow-sm disabled:opacity-50"
             aria-label="Add to cart"

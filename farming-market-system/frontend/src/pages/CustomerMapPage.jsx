@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import AppLayout from '../layouts/AppLayout';
 import FarmerMapView from '../components/FarmerMapView';
 import SearchAndFilterBar from '../components/SearchAndFilterBar';
@@ -18,6 +18,8 @@ export default function CustomerMapPage() {
   const [location, setLocation] = useState('');
   const [radiusKm, setRadiusKm] = useState('25');
   const [error, setError] = useState('');
+  const [searchParams] = useSearchParams();
+  const selectedProductId = searchParams.get('productId');
 
   useEffect(() => {
     const load = async () => {
@@ -48,11 +50,12 @@ export default function CustomerMapPage() {
   const visible = useMemo(
     () =>
       products.filter((product) => {
+        if (selectedProductId && String(product.productId) !== String(selectedProductId)) return false;
         if (status === 'READY_NOW' && (product.availabilityStatus || 'AVAILABLE') !== 'AVAILABLE') return false;
         if (status === 'MATURING_SOON' && (product.harvestStatus || '') !== 'IN_FIELD') return false;
         return true;
       }),
-    [products, status]
+    [products, selectedProductId, status]
   );
 
   const categoryOptions = useMemo(() => ['ALL', ...categories.map((entry) => entry.name)], [categories]);
@@ -121,7 +124,7 @@ export default function CustomerMapPage() {
         {loading ? null : (
           <div className="space-y-3">
             {visible.slice(0, 6).map((product) => (
-              <div key={product.productId} className="rounded-[24px] bg-white/90 p-4 shadow-soft">
+              <Link key={product.productId} to={`/products/${product.productId}`} className="block rounded-[24px] bg-white/90 p-4 shadow-soft">
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <p className="text-sm font-semibold text-slate-900">{product.productName}</p>
@@ -133,7 +136,7 @@ export default function CustomerMapPage() {
                 </div>
                 <p className="mt-2 text-sm font-semibold text-farm-green">BWP {Number(product.price || 0).toFixed(2)} / {product.unit || 'unit'}</p>
                 <p className="mt-1 text-xs text-slate-500">Quantity: {product.quantity ?? 0} - Category: {product.categoryName || '-'}</p>
-              </div>
+              </Link>
             ))}
           </div>
         )}
