@@ -1,19 +1,18 @@
-name: Deploy Farming Market
+name: Deploy Farming Management System
 
 on:
   push:
-    branches:
-      - master
+    branches: [ master ]
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Deploy to EC2
+      - name: Deploy to AWS EC2
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.EC2_HOST }}
