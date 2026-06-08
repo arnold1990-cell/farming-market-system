@@ -12,6 +12,7 @@ const CheckoutPage = lazy(() => import('../pages/CheckoutPage'));
 const OrdersPage = lazy(() => import('../pages/OrdersPage'));
 const CustomerMapPage = lazy(() => import('../pages/CustomerMapPage'));
 const HarvestCalendarPage = lazy(() => import('../pages/HarvestCalendarPage'));
+const ProfilePage = lazy(() => import('../pages/ProfilePage'));
 const BuyerDashboardPage = lazy(() => import('../pages/buyer/BuyerDashboardPage'));
 const FarmerDashboardPage = lazy(() => import('../pages/farmer/FarmerDashboardPage'));
 const FarmerProductsPage = lazy(() => import('../pages/farmer/FarmerProductsPage'));
@@ -27,11 +28,14 @@ const NotFoundPage = lazy(() => import('../pages/NotFoundPage'));
 
 export const routes = [
   { path: '/', element: <LandingPage /> },
+  { path: '/home', element: <LandingPage /> },
   { path: '/login', element: <LoginPage /> },
   { path: '/register', element: <RegisterPage /> },
+  { path: '/market', element: <MarketplacePage /> },
   { path: '/marketplace', element: <MarketplacePage /> },
   { path: '/map', element: <CustomerMapPage /> },
   { path: '/calendar', element: <HarvestCalendarPage /> },
+  { path: '/profile', element: <ProfilePage /> },
   { path: '/products/:id', element: <ProductDetailsPage /> },
 
   { path: '/cart', element: <CartPage /> },

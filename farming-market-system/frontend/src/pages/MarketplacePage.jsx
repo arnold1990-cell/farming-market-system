@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Bell, ChevronRight, MapPinned, Menu, Search } from 'lucide-react';
+import { Bell, ChevronRight, MapPinned, Search } from 'lucide-react';
 import AppLayout from '../layouts/AppLayout';
 import ProductCard from '../components/ProductCard';
 import EmptyState from '../components/EmptyState';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ToastStack from '../components/ToastStack';
+import MobileMenuButton from '../components/MobileMenuButton';
 import { getApprovedMarketplaceFeed } from '../services/marketplaceService';
 import { getCategories } from '../services/categoryService';
 import { addToCart } from '../services/cartService';
@@ -108,9 +109,7 @@ export default function MarketplacePage() {
         <section className="-mx-4 rounded-b-[32px] bg-gradient-to-b from-[#10A64A] to-[#0A8E3E] px-4 pb-5 pt-4 text-white shadow-[0_18px_44px_rgba(8,160,69,0.28)] sm:-mx-5 sm:px-5">
           <div className="mx-auto max-w-screen-sm space-y-3">
             <div className="flex items-center justify-between">
-              <button type="button" className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white/15 backdrop-blur">
-                <Menu size={18} />
-              </button>
+              <MobileMenuButton className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white/15 text-white backdrop-blur" iconSize={18} />
               <div className="text-center">
                 <p className="text-[11px] text-emerald-100">Your location</p>
                 <p className="text-sm font-semibold">Gaborone</p>

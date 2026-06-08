@@ -1,12 +1,13 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Bell, ChevronRight, Clock3, MapPin, Menu, Search, ShoppingBag } from 'lucide-react';
+import { Bell, ChevronRight, Clock3, MapPin, Search, ShoppingBag } from 'lucide-react';
 import AppLayout from '../../layouts/AppLayout';
 import ProductCard from '../../components/ProductCard';
 import FarmerCard from '../../components/FarmerCard';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import EmptyState from '../../components/EmptyState';
 import OrderCard from '../../components/OrderCard';
+import MobileMenuButton from '../../components/MobileMenuButton';
 import { getMyOrders } from '../../services/orderService';
 import { getApprovedMarketplaceFeed } from '../../services/marketplaceService';
 import { getCart, addToCart } from '../../services/cartService';
@@ -103,9 +104,7 @@ export default function BuyerDashboardPage() {
         <section className="-mx-4 rounded-b-[32px] bg-gradient-to-b from-[#0FA24A] to-[#0B8F40] px-4 pb-5 pt-4 text-white shadow-[0_18px_44px_rgba(8,160,69,0.28)] sm:-mx-5 sm:px-5">
           <div className="mx-auto max-w-screen-sm space-y-3">
             <div className="flex items-center justify-between">
-              <button type="button" className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white/15 backdrop-blur">
-                <Menu size={18} />
-              </button>
+              <MobileMenuButton className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white/15 text-white backdrop-blur" iconSize={18} />
               <div className="text-center">
                 <p className="text-[11px] text-emerald-100">Your location</p>
                 <p className="text-sm font-semibold">Gaborone</p>

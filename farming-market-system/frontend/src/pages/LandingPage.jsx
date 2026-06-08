@@ -1,7 +1,8 @@
 import { Link } from 'react-router-dom';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Bell, CalendarClock, ChevronRight, Flame, MapPin, Menu, Search, Sparkles, Tag } from 'lucide-react';
+import { Bell, CalendarClock, ChevronRight, Flame, MapPin, Search, Sparkles, Tag } from 'lucide-react';
 import AppLayout from '../layouts/AppLayout';
+import MobileMenuButton from '../components/MobileMenuButton';
 import ToastStack from '../components/ToastStack';
 import ProductCard from '../components/ProductCard';
 import FarmerCard from '../components/FarmerCard';
@@ -133,12 +134,10 @@ export default function LandingPage() {
     <AppLayout showMobileNav hideHeader>
       <ToastStack toasts={toasts} onClose={(id) => setToasts((prev) => prev.filter((t) => t.id !== id))} />
       <div className="space-y-5 pb-3">
-        <section className="-mx-4 rounded-b-[34px] bg-gradient-to-b from-[#10A64A] via-[#0C9A43] to-[#089143] px-4 pb-6 pt-5 text-white shadow-[0_20px_50px_rgba(8,160,69,0.28)] sm:-mx-5 sm:px-5">
+        <section id="about" className="-mx-4 rounded-b-[34px] bg-gradient-to-b from-[#10A64A] via-[#0C9A43] to-[#089143] px-4 pb-6 pt-5 text-white shadow-[0_20px_50px_rgba(8,160,69,0.28)] sm:-mx-5 sm:px-5">
           <div className="mx-auto max-w-screen-sm space-y-4">
             <div className="flex items-center justify-between">
-              <button type="button" className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white/15 text-white backdrop-blur">
-                <Menu size={20} />
-              </button>
+              <MobileMenuButton />
               <div className="text-center">
                 <p className="text-[11px] font-medium text-emerald-100">Your location</p>
                 <p className="text-sm font-semibold">Gaborone, Botswana</p>
@@ -170,7 +169,7 @@ export default function LandingPage() {
                   <p className="text-sm font-medium text-emerald-100">Get Discount</p>
                   <p className="text-4xl font-black leading-none">25%</p>
                   <p className="max-w-[12rem] text-sm text-emerald-50">On Vegetables and Fruits</p>
-                  <Link to="/marketplace" className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-xs font-bold text-[#067A38]">
+                  <Link to="/market" className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-xs font-bold text-[#067A38]">
                     Shop Now
                     <ChevronRight size={14} />
                   </Link>
@@ -200,7 +199,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section className="space-y-3">
+        <section id="services" className="space-y-3">
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-base font-bold text-slate-900">Shop by Category</h2>
@@ -239,7 +238,7 @@ export default function LandingPage() {
               <Sparkles size={16} className="text-farm-green" />
               Most Popular Picks
             </h2>
-            <Link to="/marketplace" className="text-xs font-semibold text-farm-green">See all</Link>
+            <Link to="/market" className="text-xs font-semibold text-farm-green">See all</Link>
           </div>
           {loading ? (
             <div className="grid grid-cols-2 gap-3">
@@ -263,7 +262,7 @@ export default function LandingPage() {
           )}
         </section>
 
-        <section className="space-y-3">
+        <section id="contact" className="space-y-3">
           <div className="flex items-center justify-between">
             <h2 className="inline-flex items-center gap-1 text-base font-bold text-slate-900">
               <MapPin size={16} className="text-farm-green" />
@@ -278,7 +277,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section className="space-y-3">
+        <section id="faqs" className="space-y-3">
           <div className="flex items-center justify-between">
             <h2 className="inline-flex items-center gap-1 text-base font-bold text-slate-900">
               <Flame size={16} className="text-rose-500" />

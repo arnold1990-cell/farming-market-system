@@ -18,5 +18,10 @@ export default function HarvestCalendarPage() {
     })();
   }, []);
 
-  return <AppLayout title="Harvest Calendar">{error ? <p className="text-sm text-red-600 mb-2">{error}</p> : null}<HarvestCalendar items={items} /></AppLayout>;
+  return (
+    <AppLayout title="Harvest Calendar" hideHeader>
+      {error ? <p className="mb-3 rounded-[20px] border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-600">{error}</p> : null}
+      <HarvestCalendar items={items} />
+    </AppLayout>
+  );
 }
