@@ -68,6 +68,7 @@ export default function FarmerProductsPage() {
   const [packagingFiles, setPackagingFiles] = useState([]);
   const [toasts, setToasts] = useState([]);
   const [confirmDeleteId, setConfirmDeleteId] = useState(null);
+  const secondaryButtonClass = 'border border-farm-green/50 bg-[#F5FBF6] text-farm-green hover:bg-emerald-50';
 
   const pushToast = (message, type = 'success') => {
     const id = Date.now() + Math.random();
@@ -305,7 +306,7 @@ export default function FarmerProductsPage() {
               <Input placeholder="Pickup Latitude" type="number" value={form.pickupLatitude} onChange={(e) => setForm({ ...form, pickupLatitude: e.target.value })} />
               <Input placeholder="Pickup Longitude" type="number" value={form.pickupLongitude} onChange={(e) => setForm({ ...form, pickupLongitude: e.target.value })} />
             </div>
-            <Button className='bg-white text-farm-green border' onClick={useCurrentLocation}>Use My Current Location</Button>
+            <Button className={secondaryButtonClass} onClick={useCurrentLocation}>Use My Current Location</Button>
             <LocationPicker
               value={{ latitude: form.pickupLatitude, longitude: form.pickupLongitude, address: form.pickupAddress, city: form.city, country: form.country }}
               onChange={(next) => setForm((prev) => ({
@@ -333,7 +334,7 @@ export default function FarmerProductsPage() {
             </div>
           </>}
           <div className='flex justify-between pt-2'>
-            <Button className='bg-white text-farm-green border' onClick={() => setStep((s) => Math.max(1, s - 1))}>Back</Button>
+            <Button className={secondaryButtonClass} onClick={() => setStep((s) => Math.max(1, s - 1))}>Back</Button>
             {step < 5 ? <Button onClick={() => setStep((s) => Math.min(5, s + 1))}>Next</Button> : <Button onClick={onSave}>Save Product</Button>}
           </div>
         </div>
@@ -343,7 +344,7 @@ export default function FarmerProductsPage() {
         <div className="space-y-4">
           <p className="text-sm text-gray-600">Are you sure you want to delete this product? This action cannot be undone.</p>
           <div className="flex justify-end gap-2">
-            <button className="px-3 py-2 rounded-xl border" onClick={() => setConfirmDeleteId(null)}>Cancel</button>
+            <Button className={secondaryButtonClass} onClick={() => setConfirmDeleteId(null)}>Cancel</Button>
             <Button className="bg-red-600" onClick={confirmDelete}>Delete</Button>
           </div>
         </div>
