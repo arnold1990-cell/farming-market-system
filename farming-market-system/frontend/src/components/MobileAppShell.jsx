@@ -64,7 +64,7 @@ export default function MobileAppShell({
             user={user}
           />
         ) : null}
-        <main className="mx-auto w-full max-w-screen-sm px-4 pb-28 pt-4 sm:px-5">{children}</main>
+        <main className="mx-auto w-full max-w-[480px] px-4 pb-28 pt-4">{children}</main>
         {showBottomNav ? <BottomNavigation role={user?.role || 'BUYER'} /> : null}
         <MobileMenuOverlay open={menuOpen} onClose={() => setMenuOpen(false)} />
       </div>
