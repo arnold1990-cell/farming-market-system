@@ -105,11 +105,11 @@ export default function MarketplacePage() {
           <div className="mx-auto max-w-screen-sm space-y-3">
             <div className="rounded-[36px] bg-white px-4 py-5 shadow-[0_18px_40px_rgba(15,23,42,0.12)]">
               <div className="flex min-h-[70px] items-center justify-between gap-3">
-                <div className="logoContainer min-w-0">
+                <div className="flex min-w-0 items-center gap-3">
                   <BrandLogo priority className="shrink-0" />
                   <div className="min-w-0">
-                    <p className="brandTitle truncate">Pula Harvest</p>
-                    <p className="brandSubtitle mt-1">Fresh produce from trusted Botswana farmers</p>
+                    <p className="truncate text-lg font-black tracking-tight text-[#0A6B3A]">Market</p>
+                    <p className="mt-1 text-xs font-medium text-slate-500">Fresh produce from trusted Botswana farmers</p>
                   </div>
                 </div>
                 <MobileMenuButton className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#F3F8F4] text-[#0A6B3A] shadow-[0_8px_18px_rgba(10,107,58,0.12)]" iconSize={20} />

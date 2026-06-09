@@ -118,11 +118,11 @@ export default function LandingPage() {
           <div className="mx-auto max-w-screen-sm space-y-4">
             <div className="rounded-[36px] bg-white px-4 py-5 shadow-[0_18px_40px_rgba(15,23,42,0.12)]">
               <div className="flex min-h-[70px] items-center justify-between gap-3">
-                <div className="logoContainer min-w-0">
+                <div className="flex min-w-0 items-center gap-3">
                   <BrandLogo priority className="shrink-0" />
                   <div className="min-w-0">
-                    <p className="brandTitle truncate">Pula Harvest</p>
-                    <p className="brandSubtitle mt-1">Premium produce marketplace for Botswana</p>
+                    <p className="truncate text-[1.3rem] font-bold tracking-tight text-[#0A6B3A]">Pula Harvest</p>
+                    <p className="mt-1 text-xs font-medium text-slate-500">Premium produce marketplace for Botswana</p>
                   </div>
                 </div>
                 <MobileMenuButton

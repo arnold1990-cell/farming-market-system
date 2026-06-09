@@ -117,11 +117,11 @@ export default function HarvestCalendar({
         <div className="mx-auto w-full max-w-[480px] space-y-3">
           <div className="rounded-[36px] bg-white px-4 py-5 text-slate-900 shadow-[0_18px_40px_rgba(15,23,42,0.12)]">
             <div className="flex min-h-[70px] items-center justify-between gap-3">
-              <div className="logoContainer min-w-0">
+              <div className="flex min-w-0 items-center gap-3">
                 <BrandLogo priority className="shrink-0" />
                 <div className="min-w-0">
-                  <p className="brandTitle truncate">Pula Harvest</p>
-                  <p className="brandSubtitle mt-1 inline-flex items-center gap-1">
+                  <p className="truncate text-lg font-black tracking-tight text-[#0A6B3A]">Harvest Calendar</p>
+                  <p className="mt-1 inline-flex items-center gap-1 text-xs font-medium text-slate-500">
                     <MapPin size={12} />
                     Gaborone, Botswana
                   </p>

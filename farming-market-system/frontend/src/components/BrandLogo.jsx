@@ -10,7 +10,7 @@ export default function BrandLogo({
   ...rest
 }) {
   return (
-    <div className={`logoIconViewport ${className}`.trim()}>
+    <div className={`logoCircle ${className}`.trim()}>
       <img
         src={brandAssets.logo}
         alt={alt}
@@ -19,7 +19,7 @@ export default function BrandLogo({
         loading={priority ? 'eager' : 'lazy'}
         decoding="async"
         fetchPriority={priority ? 'high' : 'auto'}
-        className={`logoIcon ${imgClassName}`.trim()}
+        className={imgClassName}
         {...rest}
       />
     </div>

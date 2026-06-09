@@ -16,11 +16,11 @@ export default function MobileHeader({
       <div className="mx-auto max-w-screen-sm px-4 pb-4 pt-4 sm:px-5">
         <div className="glass-card rounded-[36px] border border-white/80 px-4 py-5 shadow-soft">
           <div className="flex items-center justify-between gap-3">
-            <div className="logoContainer min-w-0">
+            <div className="flex min-w-0 items-center gap-3">
               <BrandLogo priority className="shrink-0" />
               <div className="min-w-0">
-                <p className="brandTitle truncate">{title}</p>
-                {subtitle ? <p className="brandSubtitle mt-1">{subtitle}</p> : <p className="brandSubtitle mt-1">Fresh produce, harvest visibility, and trusted local farmers.</p>}
+                <p className="truncate text-lg font-black tracking-tight text-[#0A6B3A]">{title}</p>
+                {subtitle ? <p className="mt-1 truncate text-xs text-gray-500">{subtitle}</p> : <p className="mt-1 text-xs text-gray-500">Fresh produce, harvest visibility, and trusted local farmers.</p>}
               </div>
             </div>
             <MobileMenuButton
