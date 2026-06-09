@@ -12,6 +12,7 @@ import { addToCart } from '../services/cartService';
 import { getApiErrorMessage } from '../utils/errorHandler';
 import { toMediaUrl } from '../utils/media';
 import { CATEGORY_ORDER, CATEGORY_VISUALS } from '../data/categoryCatalog';
+import BrandLogo from '../components/BrandLogo';
 
 export default function LandingPage() {
   const [publicProducts, setPublicProducts] = useState([]);
@@ -124,7 +125,7 @@ export default function LandingPage() {
             </div>
 
             <div>
-              <p className="text-[13px] uppercase tracking-[0.25em] text-emerald-100">Pula Harvest</p>
+              <BrandLogo priority className="w-full max-w-[150px]" imgClassName="h-16 w-auto" />
               <h1 className="mt-2 text-[1.9rem] font-black leading-tight">Fresh farm produce, delivered with field visibility.</h1>
             </div>
 
@@ -150,9 +151,7 @@ export default function LandingPage() {
                   </Link>
                 </div>
                 <div className="flex items-end justify-end">
-                  <div className="flex h-28 w-28 items-center justify-center rounded-[30px] bg-white/10 text-3xl font-black tracking-[0.2em] shadow-inner shadow-white/10">
-                    PH
-                  </div>
+                  <BrandLogo className="w-full max-w-[128px]" imgClassName="rounded-[30px] bg-white/10 p-2 shadow-inner shadow-white/10" />
                 </div>
               </div>
             </div>

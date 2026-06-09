@@ -1,5 +1,6 @@
 import { Bell, Search } from 'lucide-react';
 import MobileMenuButton from './MobileMenuButton';
+import BrandLogo from './BrandLogo';
 
 export default function MobileHeader({
   title = 'Pula Harvest',
@@ -21,8 +22,8 @@ export default function MobileHeader({
                 iconSize={18}
               />
               <div className="min-w-0">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-emerald-700/80">Mobile Marketplace</p>
-                <p className="truncate text-2xl font-black tracking-tight text-farm-green">{title}</p>
+                <BrandLogo className="w-full max-w-[100px]" imgClassName="h-12 w-auto" />
+                <p className="mt-2 truncate text-lg font-black tracking-tight text-farm-green">{title}</p>
                 {subtitle ? <p className="mt-1 truncate text-xs text-gray-500">{subtitle}</p> : <p className="mt-1 text-xs text-gray-500">Fresh produce, harvest visibility, and trusted local farmers.</p>}
               </div>
             </div>

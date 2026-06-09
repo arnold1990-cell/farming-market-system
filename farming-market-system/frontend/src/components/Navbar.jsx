@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Menu, ShoppingCart, X } from 'lucide-react';
 import { getCurrentUser, logoutUser } from '../services/authService';
 import { getCartCount } from '../services/cartService';
+import BrandLogo from './BrandLogo';
 
 const roleHome = {
   BUYER: '/',
@@ -37,13 +38,14 @@ export default function Navbar() {
   return (
     <header className="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-gray-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-        <Link to="/" className="flex flex-col leading-tight">
-          <span className="font-bold text-farm-green text-2xl tracking-tight">Pula Harvest</span>
-          <span className="text-[11px] text-gray-500">Connecting Farmers & Buyers Across Botswana</span>
+        <Link to="/" className="flex items-center gap-3 leading-tight">
+          <BrandLogo priority className="w-full max-w-[150px]" imgClassName="h-14 w-auto" />
+          <span className="hidden text-[11px] text-gray-500 lg:block">Connecting Farmers & Buyers Across Botswana</span>
         </Link>
 
         <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-gray-700">
           <Link className="hover:text-farm-green" to="/marketplace">Marketplace</Link>
+          <Link className="hover:text-farm-green" to="/about">About</Link>
           <Link className="hover:text-farm-green inline-flex items-center gap-1" to="/cart"><ShoppingCart size={16} />Cart ({cartCount})</Link>
           <a className="hover:text-farm-green" href="#how-it-works">How it Works</a>
           <a className="hover:text-farm-green" href="#seller-cta">Become a Seller</a>
@@ -70,7 +72,9 @@ export default function Navbar() {
 
       {open ? (
         <div className="md:hidden border-t border-gray-100 bg-white px-4 py-3 space-y-2 text-sm">
+          <BrandLogo className="mx-auto w-full max-w-[104px] pb-2" imgClassName="mx-auto" />
           <Link onClick={() => setOpen(false)} className="block py-2" to="/marketplace">Marketplace</Link>
+          <Link onClick={() => setOpen(false)} className="block py-2" to="/about">About</Link>
           <Link onClick={() => setOpen(false)} className="block py-2" to="/cart">Cart ({cartCount})</Link>
           <a onClick={() => setOpen(false)} className="block py-2" href="#how-it-works">How it Works</a>
           <a onClick={() => setOpen(false)} className="block py-2" href="#seller-cta">Become a Seller</a>

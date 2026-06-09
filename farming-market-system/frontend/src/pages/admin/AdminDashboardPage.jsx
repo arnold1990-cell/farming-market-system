@@ -8,6 +8,7 @@ import EmptyState from '../../components/EmptyState';
 import { Users, Tractor, ShoppingCart, DollarSign, AlertTriangle, Truck } from 'lucide-react';
 import { getDashboardStats, getAllOrdersAdmin, getMonetizationSummary, getRedFlags } from '../../services/adminService';
 import { getApiErrorMessage } from '../../utils/errorHandler';
+import BrandLogo from '../../components/BrandLogo';
 
 export default function AdminDashboardPage() {
   const [stats, setStats] = useState(null);
@@ -52,6 +53,7 @@ export default function AdminDashboardPage() {
     <AppLayout title="Admin Dashboard" subtitle="Control marketplace health">
       <div className="space-y-4">
         <section className="rounded-[30px] bg-white/90 p-4 shadow-soft">
+          <BrandLogo priority className="w-full max-w-[148px]" imgClassName="h-16 w-auto" />
           <h1 className="text-xl font-black text-slate-900">Marketplace operations</h1>
           <p className="mt-1 text-sm text-slate-500">Monitor farmers, listings, orders, deliveries, and revenue from live system data only.</p>
           <div className="mt-4 grid grid-cols-3 gap-2 text-center">

@@ -4,8 +4,10 @@ export default {
     extend: {
       colors: {
         farm: {
-          green: '#2f6f3e',
-          mint: '#e9f5ec',
+          green: '#149943',
+          light: '#93ca3a',
+          blue: '#35a5da',
+          mint: '#eef8eb',
           cream: '#f7f3e8',
           charcoal: '#1f2937',
           gray: '#f3f4f6'

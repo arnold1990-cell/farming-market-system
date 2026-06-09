@@ -1,3 +1,10 @@
+:root {
+  --brand-primary-green: #149943;
+  --brand-secondary-light-green: #93ca3a;
+  --brand-water-blue: #35a5da;
+  --brand-surface: #ffffff;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -21,12 +28,13 @@ html {
 }
 
 body {
-  background-color: #f7faf8;
+  background-color: var(--brand-surface);
   color: #1f2937;
   font-family: 'Avenir Next', 'Trebuchet MS', 'Segoe UI', sans-serif;
   background:
-    radial-gradient(circle at top, rgba(16, 166, 74, 0.1), transparent 24rem),
-    linear-gradient(180deg, #f7faf8 0%, #f4f8f5 38%, #f7faf8 100%);
+    radial-gradient(circle at top, rgba(20, 153, 67, 0.12), transparent 24rem),
+    radial-gradient(circle at right, rgba(53, 165, 218, 0.08), transparent 20rem),
+    linear-gradient(180deg, #ffffff 0%, #f5fbf5 38%, #ffffff 100%);
 }
 
 img {

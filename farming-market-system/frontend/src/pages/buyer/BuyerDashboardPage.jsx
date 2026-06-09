@@ -14,6 +14,7 @@ import { getCart, addToCart } from '../../services/cartService';
 import { getApiErrorMessage } from '../../utils/errorHandler';
 import { toMediaUrl } from '../../utils/media';
 import { CATEGORY_ORDER, CATEGORY_VISUALS } from '../../data/categoryCatalog';
+import BrandLogo from '../../components/BrandLogo';
 
 const promoImage = 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=800&q=80';
 
@@ -108,7 +109,7 @@ export default function BuyerDashboardPage() {
             </div>
 
             <div>
-              <p className="text-[12px] font-semibold tracking-[0.24em] text-emerald-100">PULA HARVEST</p>
+              <BrandLogo priority className="w-full max-w-[150px]" imgClassName="h-16 w-auto" />
               <h1 className="mt-1 text-[1.5rem] font-black leading-tight">Fresh groceries delivered fast</h1>
             </div>
 

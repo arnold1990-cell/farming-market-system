@@ -1,9 +1,10 @@
 import { Link } from 'react-router-dom';
 import { ChevronRight, X } from 'lucide-react';
+import BrandLogo from './BrandLogo';
 
 const menuItems = [
   { label: 'Home', to: '/home' },
-  { label: 'About', to: '/home#about' },
+  { label: 'About', to: '/about' },
   { label: 'Services', to: '/home#services' },
   { label: 'Marketplace', to: '/market' },
   { label: 'Contact', to: '/home#contact' },
@@ -22,7 +23,7 @@ export default function MobileMenuOverlay({ open, onClose }) {
         >
           <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.26em] text-emerald-700/70">Pula Harvest</p>
+              <BrandLogo className="w-full max-w-[104px]" imgClassName="mx-auto sm:mx-0" />
               <h2 className="mt-2 text-xl font-black tracking-tight text-slate-900">Fresh farm produce for Botswana.</h2>
             </div>
             <button
