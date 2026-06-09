@@ -119,9 +119,7 @@ export default function LandingPage() {
             <div className="rounded-[36px] bg-white px-4 py-5 shadow-[0_18px_40px_rgba(15,23,42,0.12)]">
               <div className="flex min-h-[70px] items-center justify-between gap-3">
                 <div className="flex min-w-0 items-center gap-3">
-                  <div className="logoCircle shrink-0">
-                    <BrandLogo priority className="w-[58px]" imgClassName="mx-auto" />
-                  </div>
+                  <BrandLogo priority className="shrink-0" />
                   <div className="min-w-0">
                     <p className="truncate text-[1.3rem] font-bold tracking-tight text-[#0A6B3A]">Pula Harvest</p>
                     <p className="mt-1 text-xs font-medium text-slate-500">Premium produce marketplace for Botswana</p>

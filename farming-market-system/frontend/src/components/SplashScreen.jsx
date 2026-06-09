@@ -6,7 +6,7 @@ export default function SplashScreen({ label = 'Loading Pula Harvest...' }) {
       <div className="w-full max-w-sm text-center">
         <BrandLogo
           priority
-          className="mx-auto w-full max-w-[320px]"
+          className="mx-auto shrink-0"
           imgClassName="drop-shadow-[0_24px_54px_rgba(20,153,67,0.18)]"
         />
         <p className="mt-5 text-sm font-semibold tracking-[0.18em] text-farm-green">{label}</p>

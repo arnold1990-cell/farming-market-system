@@ -1,6 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { LogOut, Mail, UserRound } from 'lucide-react';
 import AppLayout from '../layouts/AppLayout';
+import BrandLogo from '../components/BrandLogo';
 import { getCurrentUser, isAuthenticated, logoutUser } from '../services/authService';
 
 const roleLinks = {
@@ -39,9 +40,7 @@ export default function ProfilePage() {
           {authenticated ? (
             <>
               <div className="flex items-center gap-4">
-                <div className="flex h-16 w-16 items-center justify-center rounded-[22px] bg-gradient-to-br from-farm-green to-emerald-500 text-white shadow-soft">
-                  <UserRound size={28} />
-                </div>
+                <BrandLogo priority className="shrink-0" />
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-700">Account</p>
                   <h1 className="mt-1 text-2xl font-black text-slate-900">{user.email}</h1>
@@ -68,9 +67,7 @@ export default function ProfilePage() {
             </>
           ) : (
             <>
-              <div className="flex h-16 w-16 items-center justify-center rounded-[22px] bg-emerald-50 text-emerald-700">
-                <Mail size={28} />
-              </div>
+              <BrandLogo priority className="shrink-0" />
               <h1 className="mt-4 text-2xl font-black text-slate-900">Sign in to manage your profile.</h1>
               <p className="mt-2 text-sm text-slate-500">Access orders, farm tools, and saved account details from one place.</p>
               <div className="mt-5 grid grid-cols-2 gap-3">

@@ -58,7 +58,7 @@ export default function FarmerDashboardPage() {
     <AppLayout title="Farmer Dashboard" subtitle="Manage field produce and harvest readiness">
       <div className="space-y-4">
         <section className="rounded-[30px] bg-gradient-to-br from-farm-green via-emerald-600 to-lime-600 p-4 text-white shadow-soft">
-          <BrandLogo priority className="w-full max-w-[148px]" imgClassName="h-16 w-auto rounded-2xl bg-white px-2 py-1" />
+          <BrandLogo priority className="mb-3 shrink-0" />
           <h1 className="text-2xl font-black">Your farm operations</h1>
           <p className="mt-2 text-sm text-emerald-50">Update live produce availability, maintain pickup locations, and keep harvest plans visible to buyers.</p>
           <div className="mt-4 grid grid-cols-2 gap-2">

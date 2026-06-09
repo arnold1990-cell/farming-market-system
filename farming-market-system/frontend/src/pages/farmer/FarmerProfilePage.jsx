@@ -3,6 +3,7 @@ import AppLayout from '../../layouts/AppLayout';
 import Input from '../../components/Input';
 import Button from '../../components/Button';
 import LocationPicker from '../../components/LocationPicker';
+import BrandLogo from '../../components/BrandLogo';
 import { upsertFarmerProfile } from '../../services/farmerProfileService';
 import { getApiErrorMessage } from '../../utils/errorHandler';
 
@@ -54,7 +55,13 @@ export default function FarmerProfilePage() {
   return (
     <AppLayout links={links}>
       <div className="mx-auto max-w-4xl rounded-3xl border border-green-100 bg-white p-5 shadow-sm space-y-4">
-        <h1 className="text-2xl font-semibold text-farm-green">Farmer Profile Location</h1>
+        <div className="flex items-center gap-3">
+          <BrandLogo priority className="shrink-0" />
+          <div>
+            <h1 className="text-2xl font-semibold text-farm-green">Farmer Profile Location</h1>
+            <p className="text-sm text-slate-500">Keep your farm details aligned with the Pula Harvest marketplace.</p>
+          </div>
+        </div>
         <div className="grid gap-3 md:grid-cols-2">
           <Input placeholder="Farm Name" value={form.farmName} onChange={(e) => setForm({ ...form, farmName: e.target.value })} />
           <Input placeholder="Contact Number" value={form.contactNumber} onChange={(e) => setForm({ ...form, contactNumber: e.target.value })} />

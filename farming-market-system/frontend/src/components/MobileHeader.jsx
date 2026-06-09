@@ -1,4 +1,4 @@
-import { Bell, Search } from 'lucide-react';
+import { Search } from 'lucide-react';
 import MobileMenuButton from './MobileMenuButton';
 import BrandLogo from './BrandLogo';
 
@@ -14,27 +14,19 @@ export default function MobileHeader({
   return (
     <header className="sticky top-0 z-40 border-b border-white/60 bg-[#f8fbf6]/90 backdrop-blur">
       <div className="mx-auto max-w-screen-sm px-4 pb-4 pt-4 sm:px-5">
-        <div className="glass-card rounded-[28px] border border-white/80 px-4 py-4 shadow-soft">
+        <div className="glass-card rounded-[36px] border border-white/80 px-4 py-5 shadow-soft">
           <div className="flex items-center justify-between gap-3">
-            <div className="flex min-w-0 items-start gap-3">
-              <MobileMenuButton
-                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-emerald-100 bg-white text-slate-700 shadow-sm"
-                iconSize={18}
-              />
+            <div className="flex min-w-0 items-center gap-3">
+              <BrandLogo priority className="shrink-0" />
               <div className="min-w-0">
-                <BrandLogo className="w-full max-w-[100px]" imgClassName="h-12 w-auto" />
-                <p className="mt-2 truncate text-lg font-black tracking-tight text-farm-green">{title}</p>
+                <p className="truncate text-lg font-black tracking-tight text-[#0A6B3A]">{title}</p>
                 {subtitle ? <p className="mt-1 truncate text-xs text-gray-500">{subtitle}</p> : <p className="mt-1 text-xs text-gray-500">Fresh produce, harvest visibility, and trusted local farmers.</p>}
               </div>
             </div>
-            <div className="flex items-center gap-2">
-              <button type="button" className="rounded-full border border-emerald-100 bg-white p-2.5 text-gray-600 shadow-sm" aria-label="Notifications">
-                <Bell size={17} />
-              </button>
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-farm-green to-emerald-500 text-sm font-semibold text-white shadow-sm">
-                {user?.email?.[0]?.toUpperCase() || 'G'}
-              </div>
-            </div>
+            <MobileMenuButton
+              className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#F3F8F4] text-[#0A6B3A] shadow-[0_8px_18px_rgba(10,107,58,0.12)]"
+              iconSize={20}
+            />
           </div>
           {showSearch ? (
             <form onSubmit={onSearchSubmit} className="mt-4">

@@ -23,7 +23,7 @@ export default function MobileMenuOverlay({ open, onClose }) {
         >
           <div className="flex items-start justify-between gap-4">
             <div>
-              <BrandLogo className="w-full max-w-[104px]" imgClassName="mx-auto sm:mx-0" />
+              <BrandLogo className="shrink-0" />
               <h2 className="mt-2 text-xl font-black tracking-tight text-slate-900">Fresh farm produce for Botswana.</h2>
             </div>
             <button

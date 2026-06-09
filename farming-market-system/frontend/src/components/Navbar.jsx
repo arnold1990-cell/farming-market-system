@@ -39,7 +39,7 @@ export default function Navbar() {
     <header className="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-gray-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-3 leading-tight">
-          <BrandLogo priority className="w-full max-w-[150px]" imgClassName="h-14 w-auto" />
+          <BrandLogo priority className="shrink-0" />
           <span className="hidden text-[11px] text-gray-500 lg:block">Connecting Farmers & Buyers Across Botswana</span>
         </Link>
 
@@ -72,7 +72,7 @@ export default function Navbar() {
 
       {open ? (
         <div className="md:hidden border-t border-gray-100 bg-white px-4 py-3 space-y-2 text-sm">
-          <BrandLogo className="mx-auto w-full max-w-[104px] pb-2" imgClassName="mx-auto" />
+          <BrandLogo className="mx-auto shrink-0 pb-2" />
           <Link onClick={() => setOpen(false)} className="block py-2" to="/marketplace">Marketplace</Link>
           <Link onClick={() => setOpen(false)} className="block py-2" to="/about">About</Link>
           <Link onClick={() => setOpen(false)} className="block py-2" to="/cart">Cart ({cartCount})</Link>

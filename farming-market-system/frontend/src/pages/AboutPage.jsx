@@ -21,7 +21,7 @@ export default function AboutPage() {
     <AppLayout title="About Pula Harvest" subtitle="Official platform branding and marketplace mission">
       <div className="space-y-4">
         <section className="rounded-[30px] bg-white p-5 shadow-soft">
-          <BrandLogo className="mx-auto w-full max-w-[240px]" priority imgClassName="mx-auto" />
+          <BrandLogo className="mx-auto shrink-0" priority />
           <div className="mt-5 text-center">
             <p className="text-xs font-semibold uppercase tracking-[0.3em] text-farm-green">Official Application Logo</p>
             <h1 className="mt-3 text-2xl font-black text-slate-900">Pula Harvest</h1>

@@ -109,7 +109,7 @@ export default function BuyerDashboardPage() {
             </div>
 
             <div>
-              <BrandLogo priority className="w-full max-w-[150px]" imgClassName="h-16 w-auto" />
+              <BrandLogo priority className="shrink-0" />
               <h1 className="mt-1 text-[1.5rem] font-black leading-tight">Fresh groceries delivered fast</h1>
             </div>
 

@@ -1,12 +1,13 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Bell, ChevronRight, MapPinned, Search } from 'lucide-react';
+import { ChevronRight, MapPinned, Search } from 'lucide-react';
 import AppLayout from '../layouts/AppLayout';
 import ProductCard from '../components/ProductCard';
 import EmptyState from '../components/EmptyState';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ToastStack from '../components/ToastStack';
 import MobileMenuButton from '../components/MobileMenuButton';
+import BrandLogo from '../components/BrandLogo';
 import { getApprovedMarketplaceFeed } from '../services/marketplaceService';
 import { getCategories } from '../services/categoryService';
 import { addToCart } from '../services/cartService';
@@ -102,20 +103,20 @@ export default function MarketplacePage() {
       <div className="space-y-4 pb-4">
         <section className="-mx-4 rounded-b-[32px] bg-gradient-to-b from-[#10A64A] to-[#0A8E3E] px-4 pb-5 pt-4 text-white shadow-[0_18px_44px_rgba(8,160,69,0.28)] sm:-mx-5 sm:px-5">
           <div className="mx-auto max-w-screen-sm space-y-3">
-            <div className="flex items-center justify-between">
-              <MobileMenuButton className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white/15 text-white backdrop-blur" iconSize={18} />
-              <div className="text-center">
-                <p className="text-[11px] text-emerald-100">Your location</p>
-                <p className="text-sm font-semibold">Gaborone</p>
+            <div className="rounded-[36px] bg-white px-4 py-5 shadow-[0_18px_40px_rgba(15,23,42,0.12)]">
+              <div className="flex min-h-[70px] items-center justify-between gap-3">
+                <div className="flex min-w-0 items-center gap-3">
+                  <BrandLogo priority className="shrink-0" />
+                  <div className="min-w-0">
+                    <p className="truncate text-lg font-black tracking-tight text-[#0A6B3A]">Market</p>
+                    <p className="mt-1 text-xs font-medium text-slate-500">Fresh produce from trusted Botswana farmers</p>
+                  </div>
+                </div>
+                <MobileMenuButton className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#F3F8F4] text-[#0A6B3A] shadow-[0_8px_18px_rgba(10,107,58,0.12)]" iconSize={20} />
               </div>
-              <button type="button" className="relative flex h-10 w-10 items-center justify-center rounded-2xl bg-white/15 backdrop-blur">
-                <Bell size={18} />
-                <span className="absolute right-2 top-2 h-2.5 w-2.5 rounded-full bg-yellow-300" />
-              </button>
             </div>
 
             <div>
-              <p className="text-[12px] font-semibold tracking-[0.24em] text-emerald-100">MARKET</p>
               <h1 className="mt-1 text-[1.5rem] font-black leading-tight">Fresh groceries delivered fast</h1>
             </div>
 

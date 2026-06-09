@@ -6,6 +6,7 @@ import Modal from './Modal';
 import Input from './Input';
 import Button from './Button';
 import Select from './Select';
+import BrandLogo from './BrandLogo';
 
 const monthLabel = (value) =>
   value.toLocaleDateString('en-BW', { month: 'long', year: 'numeric' });
@@ -114,25 +115,25 @@ export default function HarvestCalendar({
     <div className="space-y-3 pb-2">
       <section className="-mx-4 overflow-hidden rounded-b-[28px] bg-gradient-to-b from-[#0fa24a] via-[#0b9441] to-[#0a8b3d] px-4 pb-4 pt-4 text-white shadow-[0_18px_40px_rgba(8,160,69,0.24)]">
         <div className="mx-auto w-full max-w-[480px] space-y-3">
-          <div className="flex items-center justify-between">
-            <MobileMenuButton />
-            <div className="text-center">
-              <p className="text-[10px] font-medium text-emerald-100">Your location</p>
-              <p className="inline-flex items-center gap-1 text-[13px] font-semibold">
-                <MapPin size={12} />
-                Gaborone, Botswana
-              </p>
+          <div className="rounded-[36px] bg-white px-4 py-5 text-slate-900 shadow-[0_18px_40px_rgba(15,23,42,0.12)]">
+            <div className="flex min-h-[70px] items-center justify-between gap-3">
+              <div className="flex min-w-0 items-center gap-3">
+                <BrandLogo priority className="shrink-0" />
+                <div className="min-w-0">
+                  <p className="truncate text-lg font-black tracking-tight text-[#0A6B3A]">Harvest Calendar</p>
+                  <p className="mt-1 inline-flex items-center gap-1 text-xs font-medium text-slate-500">
+                    <MapPin size={12} />
+                    Gaborone, Botswana
+                  </p>
+                </div>
+              </div>
+              <MobileMenuButton className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#F3F8F4] text-[#0A6B3A] shadow-[0_8px_18px_rgba(10,107,58,0.12)]" iconSize={20} />
             </div>
-            <button type="button" className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-white/15 text-white backdrop-blur" aria-label="Notifications">
-              <Bell size={16} />
-              <span className="absolute right-2 top-2 h-2.5 w-2.5 rounded-full bg-yellow-300" />
-            </button>
           </div>
 
           <div className="rounded-[24px] bg-white px-3.5 pb-3.5 pt-3 text-slate-900 shadow-[0_14px_36px_rgba(0,0,0,0.14)]">
             <div className="flex items-start justify-between gap-3">
               <div className="max-w-[14rem]">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-emerald-700">Pula Harvest</p>
                 <h1 className="mt-1.5 text-[2rem] font-black leading-none text-slate-950">Harvest Calendar</h1>
                 <p className="mt-1 text-[15px] text-slate-600">Harvest, delivery, market, and reminder events from live APIs.</p>
               </div>
