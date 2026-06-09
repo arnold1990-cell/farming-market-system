@@ -5,21 +5,43 @@
   --brand-surface: #ffffff;
 }
 
-.logoCircle {
-  width: 70px;
-  height: 70px;
-  border-radius: 999px;
-  background: white;
+.logoIconViewport {
+  width: 80px;
+  height: 80px;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  flex-shrink: 0;
 }
 
-.logoCircle img {
-  width: 58px;
-  height: 58px;
+.logoIcon {
+  width: 80px;
+  height: 80px;
   object-fit: contain;
+  object-position: top center;
+  transform: scale(1.58) translateY(-17px);
+  transform-origin: top center;
+  max-width: none;
+}
+
+.logoContainer {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.brandTitle {
+  font-size: 32px;
+  font-weight: 800;
+  color: #0f6b3f;
+  line-height: 1;
+}
+
+.brandSubtitle {
+  font-size: 16px;
+  color: #6b7280;
+  line-height: 1.4;
 }
 
 * {
