@@ -5,6 +5,23 @@
   --brand-surface: #ffffff;
 }
 
+.logoCircle {
+  width: 70px;
+  height: 70px;
+  border-radius: 999px;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.logoCircle img {
+  width: 58px;
+  height: 58px;
+  object-fit: contain;
+}
+
 * {
   box-sizing: border-box;
 }

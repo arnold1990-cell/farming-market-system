@@ -14,6 +14,10 @@ import { toMediaUrl } from '../utils/media';
 import { CATEGORY_ORDER, CATEGORY_VISUALS } from '../data/categoryCatalog';
 import BrandLogo from '../components/BrandLogo';
 
+const heroProduceImage = 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=900&q=80';
+const heroFarmImage = 'https://images.unsplash.com/photo-1500937386664-56d1dfef3854?auto=format&fit=crop&w=900&q=80';
+const discountProduceImage = 'https://images.unsplash.com/photo-1518843875459-f738682238a6?auto=format&fit=crop&w=700&q=80';
+
 export default function LandingPage() {
   const [publicProducts, setPublicProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -110,26 +114,49 @@ export default function LandingPage() {
     <AppLayout showMobileNav hideHeader>
       <ToastStack toasts={toasts} onClose={(id) => setToasts((prev) => prev.filter((t) => t.id !== id))} />
       <div className="space-y-5 pb-3">
-        <section id="about" className="-mx-4 rounded-b-[34px] bg-gradient-to-b from-[#10A64A] via-[#0C9A43] to-[#089143] px-4 pb-6 pt-5 text-white shadow-[0_20px_50px_rgba(8,160,69,0.28)] sm:-mx-5 sm:px-5">
+        <section id="about" className="-mx-4 bg-gradient-to-b from-[#0F9E49] via-[#0B8D40] to-[#078039] px-4 pb-6 pt-5 sm:-mx-5 sm:px-5">
           <div className="mx-auto max-w-screen-sm space-y-4">
-            <div className="flex items-center justify-between">
-              <MobileMenuButton />
-              <div className="text-center">
-                <p className="text-[11px] font-medium text-emerald-100">Your location</p>
-                <p className="text-sm font-semibold">Gaborone, Botswana</p>
+            <div className="rounded-[36px] bg-white px-4 py-5 shadow-[0_18px_40px_rgba(15,23,42,0.12)]">
+              <div className="flex min-h-[70px] items-center justify-between gap-3">
+                <div className="flex min-w-0 items-center gap-3">
+                  <div className="logoCircle shrink-0">
+                    <BrandLogo priority className="w-[58px]" imgClassName="mx-auto" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="truncate text-[1.3rem] font-bold tracking-tight text-[#0A6B3A]">Pula Harvest</p>
+                    <p className="mt-1 text-xs font-medium text-slate-500">Premium produce marketplace for Botswana</p>
+                  </div>
+                </div>
+                <MobileMenuButton
+                  className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#F3F8F4] text-[#0A6B3A] shadow-[0_8px_18px_rgba(10,107,58,0.12)]"
+                  iconSize={20}
+                />
               </div>
-              <button type="button" className="relative flex h-11 w-11 items-center justify-center rounded-2xl bg-white/15 text-white backdrop-blur">
-                <Bell size={18} />
-                <span className="absolute right-2 top-2 h-2.5 w-2.5 rounded-full bg-yellow-300" />
-              </button>
             </div>
 
-            <div>
-              <BrandLogo priority className="w-full max-w-[150px]" imgClassName="h-16 w-auto" />
-              <h1 className="mt-2 text-[1.9rem] font-black leading-tight">Fresh farm produce, delivered with field visibility.</h1>
+            <div className="overflow-hidden rounded-[34px] bg-white p-3 shadow-[0_24px_52px_rgba(15,23,42,0.16)]">
+              <div className="grid grid-cols-[1.1fr_0.9fr] gap-3">
+                <div className="space-y-3 px-1 py-2">
+                  <div className="inline-flex items-center rounded-full bg-emerald-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#0A6B3A]">
+                    Gaborone, Botswana
+                  </div>
+                  <div>
+                    <h1 className="text-[1.9rem] font-black leading-tight text-slate-950">Fresh vegetables, fruit, and trusted local farmers.</h1>
+                    <p className="mt-2 text-sm leading-6 text-slate-600">Discover premium produce, harvest visibility, and reliable farm-to-market delivery in one polished marketplace.</p>
+                  </div>
+                </div>
+                <div className="grid grid-rows-2 gap-3">
+                  <div className="overflow-hidden rounded-[28px] bg-[#E8F7EC]">
+                    <img src={heroProduceImage} alt="Fresh vegetables and fruit" className="h-full w-full object-cover" />
+                  </div>
+                  <div className="overflow-hidden rounded-[28px] bg-[#E6F3EC]">
+                    <img src={heroFarmImage} alt="Modern farm landscape" className="h-full w-full object-cover" />
+                  </div>
+                </div>
+              </div>
             </div>
 
-            <label className="flex items-center gap-3 rounded-[28px] bg-white px-4 py-3 text-slate-900 shadow-lg">
+            <label className="flex items-center gap-3 rounded-[28px] bg-white px-4 py-3 text-slate-900 shadow-[0_14px_30px_rgba(15,23,42,0.12)]">
               <Search size={18} className="text-slate-400" />
               <input
                 value={search}
@@ -140,18 +167,18 @@ export default function LandingPage() {
             </label>
 
             <div className="rounded-[30px] bg-white/14 p-1 backdrop-blur">
-              <div className="grid grid-cols-[1.1fr_0.85fr] gap-3 rounded-[26px] bg-gradient-to-r from-[#066C31] to-[#0D8B3F] px-4 py-4 shadow-[0_18px_30px_rgba(0,0,0,0.18)]">
+              <div className="grid grid-cols-[1.05fr_0.95fr] gap-3 rounded-[28px] bg-gradient-to-r from-[#066C31] via-[#0B8C40] to-[#35A5DA] px-4 py-4 shadow-[0_18px_30px_rgba(0,0,0,0.18)]">
                 <div className="space-y-2">
                   <p className="text-sm font-medium text-emerald-100">Get Discount</p>
                   <p className="text-4xl font-black leading-none">25%</p>
-                  <p className="max-w-[12rem] text-sm text-emerald-50">On Vegetables and Fruits</p>
+                  <p className="max-w-[12rem] text-sm text-emerald-50">On vegetables, fruits, and farm-fresh seasonal picks.</p>
                   <Link to="/market" className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-xs font-bold text-[#067A38]">
                     Shop Now
                     <ChevronRight size={14} />
                   </Link>
                 </div>
-                <div className="flex items-end justify-end">
-                  <BrandLogo className="w-full max-w-[128px]" imgClassName="rounded-[30px] bg-white/10 p-2 shadow-inner shadow-white/10" />
+                <div className="overflow-hidden rounded-[24px] bg-white/20 shadow-inner shadow-white/20">
+                  <img src={discountProduceImage} alt="Fresh produce basket" className="h-full w-full object-cover" />
                 </div>
               </div>
             </div>
@@ -196,8 +223,8 @@ export default function LandingPage() {
                     active ? 'border-emerald-200 bg-white shadow-lg' : 'border-transparent bg-white/80 shadow-soft'
                   }`}
                 >
-                  <div className={`mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br ${visual.tint} text-[11px] font-black tracking-[0.18em] text-slate-700`}>
-                    {visual.label}
+                  <div className="mb-3 overflow-hidden rounded-2xl">
+                    <img src={visual.image} alt={category} className="h-12 w-full object-cover" />
                   </div>
                   <p className="line-clamp-2 text-xs font-semibold text-slate-800">{category}</p>
                 </button>
