@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ChevronRight, MapPinned, Search } from 'lucide-react';
+import { CalendarRange, ChevronRight, MapPinned, Search, Sprout } from 'lucide-react';
 import AppLayout from '../layouts/AppLayout';
 import ProductCard from '../components/ProductCard';
 import EmptyState from '../components/EmptyState';
@@ -98,7 +98,7 @@ export default function MarketplacePage() {
   };
 
   return (
-    <AppLayout title="Market" hideHeader>
+    <AppLayout title="Marketplace" hideHeader>
       <ToastStack toasts={toasts} onClose={(id) => setToasts((prev) => prev.filter((t) => t.id !== id))} />
       <div className="space-y-4 pb-4">
         <section className="-mx-4 rounded-b-[32px] bg-gradient-to-b from-[#10A64A] to-[#0A8E3E] px-4 pb-5 pt-4 text-white shadow-[0_18px_44px_rgba(8,160,69,0.28)] sm:-mx-5 sm:px-5">
@@ -108,16 +108,25 @@ export default function MarketplacePage() {
                 <div className="flex min-w-0 items-center gap-3">
                   <BrandLogo priority className="shrink-0" />
                   <div className="min-w-0">
-                    <p className="truncate text-lg font-black tracking-tight text-[#0A6B3A]">Market</p>
-                    <p className="mt-1 text-xs font-medium text-slate-500">Fresh produce from trusted Botswana farmers</p>
+                    <p className="truncate text-lg font-black tracking-tight text-[#0A6B3A]">Marketplace</p>
+                    <p className="mt-1 text-xs font-medium text-slate-500">The neighborhood farm stand, online</p>
                   </div>
                 </div>
                 <MobileMenuButton className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#F3F8F4] text-[#0A6B3A] shadow-[0_8px_18px_rgba(10,107,58,0.12)]" iconSize={20} />
               </div>
             </div>
 
-            <div>
-              <h1 className="mt-1 text-[1.5rem] font-black leading-tight">Fresh groceries delivered fast</h1>
+            <div className="space-y-3 rounded-[30px] bg-white/12 p-4 backdrop-blur">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-100">Community Marketplace</p>
+                <h1 className="mt-2 text-[1.6rem] font-black leading-tight">The Neighborhood Farm Stand, Online</h1>
+              </div>
+              <p className="text-sm leading-6 text-emerald-50">
+                Welcome to our digital community market! Every listing here represents the hard work of a local farmer right in your region.
+              </p>
+              <p className="text-sm leading-6 text-emerald-50">
+                Filter your search by crop type, location, or harvest date to find the absolute freshest food available.
+              </p>
             </div>
 
             <label className="flex items-center gap-3 rounded-[24px] bg-white px-4 py-3 text-slate-900 shadow-lg">
@@ -145,6 +154,23 @@ export default function MarketplacePage() {
               </div>
             </div>
           </div>
+        </section>
+
+        <section className="grid gap-3 sm:grid-cols-2">
+          <article className="rounded-[28px] bg-white p-4 shadow-soft">
+            <div className="flex items-center gap-2 text-farm-green">
+              <Sprout size={18} />
+              <h2 className="text-base font-bold text-slate-900">Freshly Picked</h2>
+            </div>
+            <p className="mt-2 text-sm leading-6 text-slate-600">Browse grains and veggies ready for immediate delivery or pickup today.</p>
+          </article>
+          <article className="rounded-[28px] bg-white p-4 shadow-soft">
+            <div className="flex items-center gap-2 text-farm-green">
+              <CalendarRange size={18} />
+              <h2 className="text-base font-bold text-slate-900">Coming Soon</h2>
+            </div>
+            <p className="mt-2 text-sm leading-6 text-slate-600">Reserve your share of upcoming harvests before the crops leave the ground.</p>
+          </article>
         </section>
 
         <section className="space-y-3">

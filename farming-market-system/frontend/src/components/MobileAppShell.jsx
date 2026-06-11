@@ -18,12 +18,37 @@ export default function MobileAppShell({
   hideHeader = false
 }) {
   const user = getCurrentUser();
-  const { pathname } = useLocation();
+  const { pathname, hash } = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     setMenuOpen(false);
   }, [pathname]);
+
+  useEffect(() => {
+    if (!hash) {
+      window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+      return;
+    }
+
+    const targetId = decodeURIComponent(hash.slice(1));
+    let attempts = 0;
+
+    const scrollToTarget = () => {
+      const element = document.getElementById(targetId);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        return;
+      }
+
+      if (attempts < 12) {
+        attempts += 1;
+        window.requestAnimationFrame(scrollToTarget);
+      }
+    };
+
+    scrollToTarget();
+  }, [pathname, hash]);
 
   useEffect(() => {
     const previousOverflow = document.body.style.overflow;

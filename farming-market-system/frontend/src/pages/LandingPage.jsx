@@ -1,11 +1,10 @@
 import { Link } from 'react-router-dom';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Bell, CalendarClock, ChevronRight, Flame, MapPin, Search, Sparkles, Tag } from 'lucide-react';
+import { CalendarClock, ChevronRight, MessageCircle, Search, ShieldCheck, Sparkles, Sprout, Store, Truck } from 'lucide-react';
 import AppLayout from '../layouts/AppLayout';
 import MobileMenuButton from '../components/MobileMenuButton';
 import ToastStack from '../components/ToastStack';
 import ProductCard from '../components/ProductCard';
-import FarmerCard from '../components/FarmerCard';
 import LoadingSkeleton from '../components/LoadingSkeleton';
 import { getApprovedMarketplaceFeed } from '../services/marketplaceService';
 import { addToCart } from '../services/cartService';
@@ -17,6 +16,44 @@ import BrandLogo from '../components/BrandLogo';
 const heroProduceImage = 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=900&q=80';
 const heroFarmImage = 'https://images.unsplash.com/photo-1500937386664-56d1dfef3854?auto=format&fit=crop&w=900&q=80';
 const discountProduceImage = 'https://images.unsplash.com/photo-1518843875459-f738682238a6?auto=format&fit=crop&w=700&q=80';
+
+const serviceCards = [
+  {
+    title: 'Harvest Countdown',
+    copy: 'Check real-time field updates to see exactly when crops will be ready for harvest.',
+    icon: CalendarClock
+  },
+  {
+    title: 'Flexible Delivery',
+    copy: 'Get fresh food delivered to your door or choose farm pickup to meet your grower.',
+    icon: Truck
+  },
+  {
+    title: 'Direct Chat',
+    copy: 'Talk directly with local farmers to ask questions, check quality, and build real relationships.',
+    icon: MessageCircle
+  },
+  {
+    title: 'Easy Farm Profiles',
+    copy: 'Set up a digital farm stall in minutes to showcase your upcoming yields to neighbors.',
+    icon: Store
+  }
+];
+
+const faqItems = [
+  {
+    question: 'How do I buy from Pula Harvest?',
+    answer: 'Browse the marketplace, choose what is ready now or reserve upcoming harvests, then select delivery or farm pickup.'
+  },
+  {
+    question: 'Can farmers update harvest progress?',
+    answer: 'Yes. Farmers can share crop availability in real time so neighbors know exactly what is ready and what is still growing.'
+  },
+  {
+    question: 'Is Pula Harvest only for Gaborone?',
+    answer: 'No. The platform is designed to support communities across Botswana as more local growers join.'
+  }
+];
 
 export default function LandingPage() {
   const [publicProducts, setPublicProducts] = useState([]);
@@ -72,19 +109,7 @@ export default function LandingPage() {
 
   const trendingProducts = useMemo(() => filtered.slice(0, 6), [filtered]);
   const freshFinds = useMemo(() => filtered.slice(2, 8), [filtered]);
-  const flashDeals = useMemo(() => filtered.filter((_, i) => i % 3 === 0).slice(0, 4), [filtered]);
-  const recommendedProducts = useMemo(() => filtered.slice(4, 8), [filtered]);
-  const nearbyFarmers = useMemo(() => {
-    const grouped = filtered.reduce((acc, p) => {
-      const name = p.farmerName || 'Farmer';
-      if (!acc[name]) {
-        acc[name] = { name, products: 0, location: p.pickupAddress || p.locationName || 'Unknown' };
-      }
-      acc[name].products += 1;
-      return acc;
-    }, {});
-    return Object.values(grouped).slice(0, 5);
-  }, [filtered]);
+  const upcomingHarvests = useMemo(() => filtered.filter((_, i) => i % 3 === 0).slice(0, 4), [filtered]);
 
   const readyNowCount = useMemo(
     () => filtered.filter((p) => (p.availabilityStatus || 'AVAILABLE') === 'AVAILABLE').length,
@@ -114,7 +139,7 @@ export default function LandingPage() {
     <AppLayout showMobileNav hideHeader>
       <ToastStack toasts={toasts} onClose={(id) => setToasts((prev) => prev.filter((t) => t.id !== id))} />
       <div className="space-y-5 pb-3">
-        <section id="about" className="-mx-4 bg-gradient-to-b from-[#0F9E49] via-[#0B8D40] to-[#078039] px-4 pb-6 pt-5 sm:-mx-5 sm:px-5">
+        <section id="home" className="-mx-4 bg-gradient-to-b from-[#0F9E49] via-[#0B8D40] to-[#078039] px-4 pb-6 pt-5 sm:-mx-5 sm:px-5">
           <div className="mx-auto max-w-screen-sm space-y-4">
             <div className="rounded-[36px] bg-white px-4 py-5 shadow-[0_18px_40px_rgba(15,23,42,0.12)]">
               <div className="flex min-h-[70px] items-center justify-between gap-3">
@@ -122,7 +147,7 @@ export default function LandingPage() {
                   <BrandLogo priority className="shrink-0" />
                   <div className="min-w-0">
                     <p className="truncate text-[1.3rem] font-bold tracking-tight text-[#0A6B3A]">Pula Harvest</p>
-                    <p className="mt-1 text-xs font-medium text-slate-500">Premium produce marketplace for Botswana</p>
+                    <p className="mt-1 text-xs font-medium text-slate-500">Our community&apos;s fresh farm connection</p>
                   </div>
                 </div>
                 <MobileMenuButton
@@ -136,11 +161,13 @@ export default function LandingPage() {
               <div className="grid grid-cols-[1.1fr_0.9fr] gap-3">
                 <div className="space-y-3 px-1 py-2">
                   <div className="inline-flex items-center rounded-full bg-emerald-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#0A6B3A]">
-                    Gaborone, Botswana
+                    Botswana Community Market
                   </div>
                   <div>
-                    <h1 className="text-[1.9rem] font-black leading-tight text-slate-950">Fresh vegetables, fruit, and trusted local farmers.</h1>
-                    <p className="mt-2 text-sm leading-6 text-slate-600">Discover premium produce, harvest visibility, and reliable farm-to-market delivery in one polished marketplace.</p>
+                    <h1 className="text-[1.9rem] font-black leading-tight text-slate-950">Welcome to Pula Harvest: Our Community&apos;s Fresh Farm Connection</h1>
+                    <p className="mt-2 text-sm leading-6 text-slate-600">
+                      Growing together, eating fresher! Pula Harvest brings Botswana&apos;s farmers and families closer by putting the field right on your screen. Discover nearby crops, track when they will be harvested, and secure your food straight from the source. Whether you want convenient delivery to your doorstep or love the adventure of a farm pickup, we make supporting local agriculture easy and personal.
+                    </p>
                   </div>
                 </div>
                 <div className="grid grid-rows-2 gap-3">
@@ -152,6 +179,25 @@ export default function LandingPage() {
                   </div>
                 </div>
               </div>
+            </div>
+
+            <div className="grid gap-3 sm:grid-cols-2">
+              <article className="rounded-[28px] bg-white/96 p-4 text-slate-900 shadow-[0_18px_34px_rgba(15,23,42,0.16)] transition-transform duration-300 hover:-translate-y-1">
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-farm-green">Today&apos;s Harvests</p>
+                <h2 className="mt-2 text-lg font-black">Love Fresh Food? Explore Today&apos;s Harvests</h2>
+                <Link to="/marketplace" className="mt-4 inline-flex items-center gap-2 rounded-full bg-farm-green px-4 py-2 text-xs font-bold text-white">
+                  Explore marketplace
+                  <ChevronRight size={14} />
+                </Link>
+              </article>
+              <article className="rounded-[28px] bg-white/12 p-4 text-white backdrop-blur transition-transform duration-300 hover:-translate-y-1">
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-emerald-100">For Growers</p>
+                <h2 className="mt-2 text-lg font-black">Proud Local Farmer? Share Your Fields With Us</h2>
+                <Link to="/register" className="mt-4 inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-xs font-bold text-[#067A38]">
+                  Join now
+                  <ChevronRight size={14} />
+                </Link>
+              </article>
             </div>
 
             <label className="flex items-center gap-3 rounded-[28px] bg-white px-4 py-3 text-slate-900 shadow-[0_14px_30px_rgba(15,23,42,0.12)]">
@@ -170,7 +216,7 @@ export default function LandingPage() {
                   <p className="text-sm font-medium text-emerald-100">Get Discount</p>
                   <p className="text-4xl font-black leading-none">25%</p>
                   <p className="max-w-[12rem] text-sm text-emerald-50">On vegetables, fruits, and farm-fresh seasonal picks.</p>
-                  <Link to="/market" className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-xs font-bold text-[#067A38]">
+                  <Link to="/marketplace" className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-xs font-bold text-[#067A38]">
                     Shop Now
                     <ChevronRight size={14} />
                   </Link>
@@ -187,8 +233,8 @@ export default function LandingPage() {
                 <p className="text-lg font-bold">{readyNowCount}</p>
               </div>
               <div className="rounded-[22px] bg-white/12 px-3 py-2">
-                <p className="text-[11px] text-emerald-100">Farmers</p>
-                <p className="text-lg font-bold">{nearbyFarmers.length}</p>
+                <p className="text-[11px] text-emerald-100">In view</p>
+                <p className="text-lg font-bold">{filtered.length}</p>
               </div>
               <div className="rounded-[22px] bg-white/12 px-3 py-2">
                 <p className="text-[11px] text-emerald-100">Categories</p>
@@ -201,12 +247,29 @@ export default function LandingPage() {
         <section id="services" className="space-y-3">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-base font-bold text-slate-900">Shop by Category</h2>
-              <p className="text-xs text-slate-500">Browse fresh essentials and daily staples.</p>
+              <h2 className="text-base font-bold text-slate-900">Helping Our Neighbors Grow and Thrive</h2>
+              <p className="text-xs text-slate-500">Simple, community-focused tools for buying and selling farm-fresh food.</p>
             </div>
             <button type="button" onClick={() => setSelectedCategory('ALL')} className="text-xs font-semibold text-farm-green">
               View all
             </button>
+          </div>
+          <article className="rounded-[28px] bg-white p-4 shadow-soft">
+            <p className="text-sm leading-7 text-slate-600">We offer simple, community-focused tools to make buying and selling farm-fresh food a breeze:</p>
+          </article>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {serviceCards.map((card) => {
+              const Icon = card.icon;
+              return (
+                <article key={card.title} className="rounded-[26px] border border-emerald-100 bg-white p-4 shadow-soft transition-transform duration-300 hover:-translate-y-1">
+                  <div className="flex items-center gap-2 text-farm-green">
+                    <Icon size={18} />
+                    <h3 className="text-sm font-bold text-slate-900">{card.title}</h3>
+                  </div>
+                  <p className="mt-2 text-sm leading-6 text-slate-600">{card.copy}</p>
+                </article>
+              );
+            })}
           </div>
           <div className="-mx-1 flex snap-x gap-3 overflow-x-auto px-1 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {visibleCategories.map((category) => {
@@ -235,9 +298,9 @@ export default function LandingPage() {
           <div className="flex items-center justify-between">
             <h2 className="inline-flex items-center gap-1 text-base font-bold text-slate-900">
               <Sparkles size={16} className="text-farm-green" />
-              Most Popular Picks
+              Today&apos;s Harvests
             </h2>
-            <Link to="/market" className="text-xs font-semibold text-farm-green">See all</Link>
+            <Link to="/marketplace" className="text-xs font-semibold text-farm-green">See all</Link>
           </div>
           {loading ? (
             <div className="grid grid-cols-2 gap-3">
@@ -263,49 +326,41 @@ export default function LandingPage() {
 
         <section id="contact" className="space-y-3">
           <div className="flex items-center justify-between">
-            <h2 className="inline-flex items-center gap-1 text-base font-bold text-slate-900">
-              <MapPin size={16} className="text-farm-green" />
-              Nearby Farmers
-            </h2>
+            <h2 className="inline-flex items-center gap-1 text-base font-bold text-slate-900">Contact</h2>
             <Link to="/map" className="text-xs font-semibold text-farm-green">Open map</Link>
           </div>
-          <div className="space-y-3">
-            {nearbyFarmers.map((farmer) => (
-              <FarmerCard key={`${farmer.name}-${farmer.location}`} farmer={farmer} />
-            ))}
+          <div className="grid gap-3 sm:grid-cols-2">
+            <article className="rounded-[28px] bg-white p-4 shadow-soft">
+              <div className="flex items-center gap-2 text-farm-green">
+                <ShieldCheck size={18} />
+                <h3 className="text-sm font-bold text-slate-900">Reach the Pula Harvest team</h3>
+              </div>
+              <p className="mt-2 text-sm leading-6 text-slate-600">Need help with a listing, delivery, or farmer onboarding? Use the marketplace chat tools or connect with nearby growers through the platform.</p>
+            </article>
+            <article className="rounded-[28px] bg-white p-4 shadow-soft">
+              <div className="flex items-center gap-2 text-farm-green">
+                <Truck size={18} />
+                <h3 className="text-sm font-bold text-slate-900">Choose your handoff</h3>
+              </div>
+              <p className="mt-2 text-sm leading-6 text-slate-600">Arrange doorstep delivery for convenience or coordinate a farm pickup when you want the full local market experience.</p>
+            </article>
           </div>
         </section>
 
         <section id="faqs" className="space-y-3">
           <div className="flex items-center justify-between">
             <h2 className="inline-flex items-center gap-1 text-base font-bold text-slate-900">
-              <Flame size={16} className="text-rose-500" />
-              Flash Deals
+              <Sprout size={16} className="text-farm-green" />
+              FAQs
             </h2>
-            <span className="rounded-full bg-rose-50 px-3 py-1 text-[11px] font-semibold text-rose-600">Today only</span>
+            <span className="rounded-full bg-emerald-50 px-3 py-1 text-[11px] font-semibold text-emerald-600">Helpful answers</span>
           </div>
-          <div className="grid grid-cols-2 gap-3">
-            {flashDeals.map((product) => (
-              <ProductCard
-                key={`deal-${product.id}`}
-                product={mapProduct(product, Number(product.price) * 1.18)}
-                onAdd={() => onAdd(product)}
-              />
-            ))}
-          </div>
-        </section>
-
-        <section className="space-y-3">
-          <div className="flex items-center justify-between">
-            <h2 className="inline-flex items-center gap-1 text-base font-bold text-slate-900">
-              <Tag size={16} className="text-farm-green" />
-              Fresh Finds of the Day
-            </h2>
-            <span className="text-xs font-semibold text-slate-400">Updated live</span>
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            {freshFinds.map((product) => (
-              <ProductCard key={`fresh-${product.id}`} product={mapProduct(product)} onAdd={() => onAdd(product)} />
+          <div className="space-y-3">
+            {faqItems.map((item) => (
+              <article key={item.question} className="rounded-[24px] bg-white p-4 shadow-soft">
+                <h3 className="text-sm font-bold text-slate-900">{item.question}</h3>
+                <p className="mt-2 text-sm leading-6 text-slate-600">{item.answer}</p>
+              </article>
             ))}
           </div>
         </section>
@@ -314,12 +369,27 @@ export default function LandingPage() {
           <div className="flex items-center justify-between">
             <h2 className="inline-flex items-center gap-1 text-base font-bold text-slate-900">
               <CalendarClock size={16} className="text-farm-green" />
-              Recommended Products
+              Coming Soon
+            </h2>
+            <span className="text-xs font-semibold text-slate-400">Updated live</span>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            {upcomingHarvests.map((product) => (
+              <ProductCard key={`upcoming-${product.id}`} product={mapProduct(product, Number(product.price) * 1.18)} onAdd={() => onAdd(product)} />
+            ))}
+          </div>
+        </section>
+
+        <section className="space-y-3">
+          <div className="flex items-center justify-between">
+            <h2 className="inline-flex items-center gap-1 text-base font-bold text-slate-900">
+              <Sparkles size={16} className="text-farm-green" />
+              Fresh Finds of the Day
             </h2>
           </div>
           <div className="grid grid-cols-2 gap-3">
-            {recommendedProducts.map((product) => (
-              <ProductCard key={`rec-${product.id}`} product={mapProduct(product)} onAdd={() => onAdd(product)} />
+            {freshFinds.map((product) => (
+              <ProductCard key={`fresh-${product.id}`} product={mapProduct(product)} onAdd={() => onAdd(product)} />
             ))}
           </div>
         </section>

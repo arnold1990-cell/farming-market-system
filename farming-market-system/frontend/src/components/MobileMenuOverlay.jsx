@@ -3,10 +3,10 @@ import { ChevronRight, X } from 'lucide-react';
 import BrandLogo from './BrandLogo';
 
 const menuItems = [
-  { label: 'Home', to: '/home' },
+  { label: 'Home', to: '/home#home' },
   { label: 'About', to: '/about' },
   { label: 'Services', to: '/home#services' },
-  { label: 'Marketplace', to: '/market' },
+  { label: 'Marketplace', to: '/marketplace' },
   { label: 'Contact', to: '/home#contact' },
   { label: 'FAQs', to: '/home#faqs' }
 ];
